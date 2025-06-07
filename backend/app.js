@@ -7,20 +7,28 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+app.use((err, req, res, next) => {
+  console.error('Global error:', err);
+  res.status(500).json({ 
+    error: 'Internal Server Error',
+    message: process.env.NODE_ENV === 'development' ? err.message : 'Something went wrong'
+  });
+});
 
 const sequelize = new Sequelize({
   dialect: 'sqlite',
-  storage: path.join(__dirname, 'database.sqlite'),
+  storage: process.env.VERCEL ? ':memory:' : path.join(__dirname, 'database.sqlite'),
+  logging: false 
 });
 
-
+// Slide 
 const Slide = sequelize.define('Slide', {
   order: {
     type: DataTypes.INTEGER,
     allowNull: false,
   },
   content: {
-    type: DataTypes.TEXT, 
+    type: DataTypes.TEXT,
     allowNull: false,
   },
   // layout: {
@@ -98,11 +106,45 @@ const defaultSlides = [
 ];
 
 
+let dbInitialized = false;
+async function initializeDatabase() {
+  if (dbInitialized) return;
+  
+  try {
+    await sequelize.authenticate();
+    console.log('Database connection established.');
+    
+    await sequelize.sync({ force: true });
+    const count = await Slide.count();
+    
+    if (count === 0) {
+      await Slide.bulkCreate(defaultSlides);
+      console.log('Default slides initialized successfully');
+    }
+    
+    dbInitialized = true;
+  } catch (error) {
+    console.error('Database initialization error:', error);
+    throw error; 
+  }
+}
+
+
+app.get('/health', (req, res) => {
+  res.json({ 
+    status: 'healthy',
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV
+  });
+});
+
+
 app.get('/', (req, res) => {
   res.json({ 
     status: 'ok',
     message: 'Slides API is running',
     version: '1.0.0',
+    environment: process.env.NODE_ENV,
     endpoints: {
       slides: '/slides',
       health: '/health'
@@ -111,59 +153,40 @@ app.get('/', (req, res) => {
 });
 
 
-app.get('/health', (req, res) => {
-  res.json({ status: 'healthy' });
-});
-
-async function initializeDatabase() {
+app.get('/slides', async (req, res, next) => {
   try {
-
-    if (process.env.VERCEL) {
-      console.log('Running in Vercel environment, using in-memory database');
-      sequelize.options.storage = ':memory:';
-    }
-    
-    await sequelize.sync({ force: true });
-    const count = await Slide.count();
-    if (count === 0) {
-      await Slide.bulkCreate(defaultSlides);
-      console.log('Default slides initialized successfully');
-    }
-  } catch (error) {
-    console.error('Error initializing database:', error);
-  }
-}
-
-
-app.get('/slides', async (req, res) => {
-  try {
+    await initializeDatabase();
     const slides = await Slide.findAll({ order: [['order', 'ASC']] });
     res.json(slides);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    next(error);
   }
 });
 
-
-app.get('/slides/:id', async (req, res) => {
-  const slide = await Slide.findByPk(req.params.id);
-  if (!slide) return res.status(404).json({ error: 'Slide not found' });
-  res.json(slide);
+app.get('/slides/:id', async (req, res, next) => {
+  try {
+    await initializeDatabase();
+    const slide = await Slide.findByPk(req.params.id);
+    if (!slide) return res.status(404).json({ error: 'Slide not found' });
+    res.json(slide);
+  } catch (error) {
+    next(error);
+  }
 });
 
-
-app.post('/slides', async (req, res) => {
+app.post('/slides', async (req, res, next) => {
   try {
+    await initializeDatabase();
     const slide = await Slide.create(req.body);
     res.status(201).json(slide);
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    next(error);
   }
 });
 
-
-app.put('/slides/:id', async (req, res) => {
+app.put('/slides/:id', async (req, res, next) => {
   try {
+    await initializeDatabase();
     const slide = await Slide.findByPk(req.params.id);
     if (!slide) {
       return res.status(404).json({ error: 'Slide not found' });
@@ -171,13 +194,13 @@ app.put('/slides/:id', async (req, res) => {
     await slide.update(req.body);
     res.json(slide);
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    next(error);
   }
 });
 
-
-app.delete('/slides/:id', async (req, res) => {
+app.delete('/slides/:id', async (req, res, next) => {
   try {
+    await initializeDatabase();
     const slide = await Slide.findByPk(req.params.id);
     if (!slide) {
       return res.status(404).json({ error: 'Slide not found' });
@@ -185,13 +208,14 @@ app.delete('/slides/:id', async (req, res) => {
     await slide.destroy();
     res.status(204).send();
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    next(error);
   }
 });
 
 
 const PORT = process.env.PORT || 4000;
-app.listen(PORT, async () => {
-  await initializeDatabase();
+app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
+
+  initializeDatabase().catch(console.error);
 });
