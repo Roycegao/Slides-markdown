@@ -1,0 +1,253 @@
+/* Markdown editor styles */
+.w-md-editor {
+  background-color: var(--bg-primary) !important;
+  border: none !important;
+  border-radius: 0 !important;
+  overflow: hidden !important;
+  height: 100% !important;
+}
+
+/* Editor content area */
+.w-md-editor-text-pre > code,
+.w-md-editor-text-input {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace !important;
+  font-size: 14px !important;
+  line-height: 1.6 !important;
+  color: var(--text-primary, #000) !important;
+  background-color: var(--bg-primary) !important; 
+  caret-color: var(--text-primary, #000) !important;
+  box-sizing: border-box;
+}
+
+/* Editor content in dark theme */
+[data-color-mode="dark"] .w-md-editor-text-pre > code,
+[data-color-mode="dark"] .w-md-editor-text-input {
+  color: #fff !important; /* Force white text in dark mode, override conflicts */
+  background-color: #1a1a1a !important;
+  caret-color: #fff !important;
+}
+
+/* Editor toolbar */
+.w-md-editor-toolbar {
+  background-color: var(--bg-secondary) !important;
+  border-bottom: 1px solid var(--border-color) !important;
+  padding: 8px !important;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.w-md-editor-toolbar button {
+  background-color: transparent !important;
+  border: 1px solid transparent !important;
+  border-radius: 4px !important;
+  padding: 4px 8px !important;
+  color: var(--text-primary) !important;
+  font-size: 14px !important;
+  transition: all 0.2s ease !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-width: 32px !important;
+  height: 32px !important;
+}
+
+.w-md-editor-toolbar button:hover {
+  background-color: var(--hover-color) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-primary) !important;
+}
+
+.w-md-editor-toolbar button.active {
+  background-color: var(--active-color) !important;
+  border-color: var(--accent-color) !important;
+  color: var(--accent-color) !important;
+}
+
+/* Toolbar dividers and groups */
+.w-md-editor-toolbar-divider {
+  width: 1px !important;
+  height: 24px !important;
+  background-color: var(--border-color) !important;
+  margin: 0 4px !important;
+}
+
+.w-md-editor-toolbar-group {
+  display: flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+}
+
+/* Editor text selection style */
+.w-md-editor-text-input::selection {
+  background: #3390ff !important;
+  color: #fff !important;
+}
+
+/* Editor content area style */
+.w-md-editor-content {
+  background-color: var(--bg-primary) !important;
+}
+
+/* Editor preview area style */
+.w-md-editor-preview {
+  background-color: var(--bg-primary) !important;
+  color: var(--text-primary) !important;
+}
+
+/* Preview styles */
+.preview-content {
+  color: var(--text-primary);
+}
+
+.preview-content h1,
+.preview-content h2,
+.preview-content h3,
+.preview-content h4,
+.preview-content h5,
+.preview-content h6 {
+  color: var(--text-primary);
+  margin-top: 1.5em;
+  margin-bottom: 0.5em;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.preview-content h1 { font-size: 2em; }
+.preview-content h2 { font-size: 1.5em; }
+.preview-content h3 { font-size: 1.25em; }
+.preview-content h4 { font-size: 1em; }
+.preview-content h5 { font-size: 0.875em; }
+.preview-content h6 { font-size: 0.85em; }
+
+.preview-content p {
+  margin-bottom: 1em;
+  line-height: 1.6;
+}
+
+.preview-content code {
+  background-color: var(--code-bg);
+  color: var(--accent-color);
+  padding: 0.2em 0.4em;
+  border-radius: 3px;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 0.9em;
+}
+
+.preview-content ul,
+.preview-content ol {
+  padding-left: 2em;
+  margin-bottom: 1em;
+}
+
+.preview-content li {
+  margin-bottom: 0.5em;
+}
+
+.preview-content blockquote {
+  border-left: 4px solid var(--blockquote-border);
+  padding-left: 1em;
+  margin: 1em 0;
+  color: var(--text-secondary);
+}
+
+.preview-content hr {
+  border: none;
+  border-top: 1px solid var(--border-color);
+  margin: 2em 0;
+}
+
+.preview-content table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 1em 0;
+}
+
+.preview-content th,
+.preview-content td {
+  border: 1px solid var(--border-color);
+  padding: 0.75em;
+}
+
+.preview-content th {
+  background-color: var(--bg-secondary);
+  font-weight: 600;
+}
+
+.preview-content a {
+  color: var(--accent-color);
+  text-decoration: none;
+}
+
+.preview-content a:hover {
+  text-decoration: underline;
+}
+
+/* Custom scrollbar */
+.w-md-editor-text-input::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.w-md-editor-text-input::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+}
+
+.w-md-editor-text-input::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 4px;
+}
+
+.w-md-editor-text-input::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-color);
+}
+
+/* Editor split line style */
+.w-md-editor-split {
+  background-color: var(--border-color) !important;
+}
+
+/* Editor line number style */
+.w-md-editor-text-pre > code {
+  color: var(--text-primary) !important;
+}
+
+/* Editor syntax highlighting style */
+.w-md-editor-text-pre > code .token.comment,
+.w-md-editor-text-pre > code .token.prolog,
+.w-md-editor-text-pre > code .token.doctype,
+.w-md-editor-text-pre > code .token.cdata {
+  color: var(--text-secondary) !important;
+}
+
+.w-md-editor-text-pre > code .token.punctuation {
+  color: var(--text-primary) !important;
+}
+
+.w-md-editor-text-pre > code .token.property,
+.w-md-editor-text-pre > code .token.tag,
+.w-md-editor-text-pre > code .token.boolean,
+.w-md-editor-text-pre > code .token.number,
+.w-md-editor-text-pre > code .token.constant,
+.w-md-editor-text-pre > code .token.symbol {
+  color: var(--accent-color) !important;
+}
+
+.w-md-editor-text-pre > code .token.selector,
+.w-md-editor-text-pre > code .token.attr-name,
+.w-md-editor-text-pre > code .token.string,
+.w-md-editor-text-pre > code .token.char,
+.w-md-editor-text-pre > code .token.builtin {
+  color: var(--accent-color) !important;
+}
+
+[data-color-mode="dark"] .w-md-editor-content .w-md-editor-text-input {
+  color: #fff !important;
+  background-color: #1a1a1a !important;
+  caret-color: #fff !important;
+}
+
+[data-color-mode="dark"] .w-md-editor-text-input::selection {
+  background: #3390ff !important;
+  color: #fff !important;
+}

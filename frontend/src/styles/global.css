@@ -1,0 +1,1450 @@
+:root {
+  /* Light theme (default) */
+  --bg-secondary: #f8f9fa;
+  --text-primary: #2c3e50;
+  --text-secondary: #6c757d;
+  --accent-color: #3498db;
+  --border-color: #e9ecef;
+  --hover-color: #f1f3f5;
+  --active-color: #e9ecef;
+  --preview-bg: #ffffff;
+  --code-bg: #f8f9fa;
+  --blockquote-border: #e9ecef;
+}
+
+[data-theme="dark"] {
+  --bg-primary: #1a1a1a;
+  --bg-secondary: #242424;
+  --text-primary: #ffffff;
+  --text-secondary: #a0a0a0;
+  --accent-color: #646cff;
+  --border-color: #333333;
+  --hover-color: #2a2a2a;
+  --active-color: #3a3a3a;
+  --preview-bg: #1a1a1a;
+  --code-bg: #242424;
+  --blockquote-border: #333333;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  overflow-y: auto; /* Allow vertical scrolling for the entire document */
+  overflow-x: hidden; /* Hide horizontal overflow for the document */
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.app-container {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  overflow-y: auto; /* Allow vertical scrolling for the app container */
+  overflow-x: hidden; /* Hide horizontal overflow */
+}
+
+/* Sidebar */
+.sidebar {
+  width: 280px;
+  background-color: var(--bg-secondary);
+  border-right: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.sidebar-header {
+  padding: 20px;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.sidebar-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.slides-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px;
+}
+
+.slide-item {
+  position: relative;
+  padding: 12px 16px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  background-color: var(--bg-primary);
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  user-select: none;
+  border: 1px solid var(--border-color);
+}
+
+.slide-item:hover {
+  background-color: var(--hover-color);
+}
+
+.slide-item.active {
+  background-color: var(--active-color);
+  border-color: var(--accent-color);
+}
+
+.slide-item.dragging {
+  background-color: var(--hover-color);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: scale(1.02);
+  z-index: 1000;
+}
+
+.slide-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.slide-item-order {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  background-color: var(--bg-secondary);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.slide-item-drag-handle {
+  color: var(--text-secondary);
+  cursor: grab;
+  font-size: 1.2rem;
+  padding: 4px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.slide-item-drag-handle:hover {
+  background-color: var(--hover-color);
+  color: var(--text-primary);
+}
+
+.slide-item-drag-handle:active {
+  cursor: grabbing;
+}
+
+.slide-item-title {
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+  font-weight: 500;
+}
+
+.slide-item-preview {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin-bottom: 4px;
+  max-height: 60px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.slide-item-layout {
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+  text-transform: capitalize;
+  background-color: var(--bg-secondary);
+  padding: 2px 6px;
+  border-radius: 4px;
+  display: inline-block;
+}
+
+/* Placeholder style for drag and drop */
+.slides-list .placeholder {
+  background-color: var(--hover-color);
+  border: 2px dashed var(--border-color);
+  border-radius: 6px;
+  margin-bottom: 8px;
+  height: 100px;
+}
+
+/* Preview area */
+.preview-container {
+  flex: 1 1 0%;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--bg-primary);
+  border-right: 1px solid var(--border-color);
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+  height: 100vh; /* Ensure container takes full viewport height */
+  overflow: hidden; /* Prevent double scrollbars */
+}
+
+.preview-header {
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.preview-content {
+  flex: 1;
+  padding: 2rem;
+  overflow-y: auto; /* Enable vertical scrolling */
+  font-size: 1.2rem;
+  line-height: 1.6;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: normal;
+  max-width: 100%;
+  background-color: transparent;
+  display: flex;
+  flex-direction: column;
+  min-height: 0; /* Important: Allow content area to shrink */
+}
+
+/* Ensure all markdown elements inside preview content wrap text */
+.preview-content p,
+.preview-content h1,
+.preview-content h2,
+.preview-content h3,
+.preview-content h4,
+.preview-content h5,
+.preview-content h6,
+.preview-content ul,
+.preview-content ol,
+.preview-content blockquote,
+.preview-content table,
+.preview-content hr,
+.preview-content img,
+.preview-content a {
+  background-color: transparent !important; /* Force transparent background for all common markdown elements */
+  color: var(--text-primary) !important; /* Ensure text color is inherited or set to primary */
+  white-space: normal; /* Ensure text wraps normally */
+  word-break: break-word; /* Break long words */
+}
+
+.preview-content pre {
+  background-color: #1e1e1e; /* Dark background for code blocks in normal preview */
+  color: #d4d4d4;
+  border-radius: 15px;
+  overflow-x: auto; /* Allow horizontal scrolling for long code lines */
+  text-align: left; /* Keep code content left-aligned for readability */
+  word-break: normal; /* Prevent breaking words inside pre, handled by overflow-x */
+  width: 80%; /* Reduce width to allow centering */
+  max-width: 1200px; /* Set a reasonable max-width */
+  margin: 0 auto; /* Center the code block */
+  padding: 1.5em; /* Add some padding */
+}
+
+.preview-content code {
+  background-color: #1e1e1e; /* Dark background for inline code in normal preview */
+  color: #d4d4d4;
+  padding: 0.2em 0.4em;
+  border-radius: 3px;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 0.9em;
+  white-space: pre-wrap; /* Allow inline code to wrap */
+  word-break: break-word; /* Allow breaking long words in inline code */
+  display: inline-block; /* Allow centering of inline code */
+  text-align: left; /* Keep code content left-aligned */
+}
+
+/* Syntax highlighting styles for normal preview */
+.preview-content .hljs {
+  background: transparent !important; /* Make highlight.js background transparent */
+  color: inherit !important; /* Inherit color from parent */
+  white-space: pre-wrap; /* Ensure highlighted text wraps */
+  word-break: break-word; /* Ensure highlighted text breaks words */
+  font-size: 24px;
+}
+
+.preview-content .hljs-keyword,
+.preview-content .hljs-selector-tag,
+.preview-content .hljs-subst {
+  color: #569cd6 !important;
+}
+
+.preview-content .hljs-string,
+.preview-content .hljs-doctag {
+  color: #ce9178 !important;
+}
+
+.preview-content .hljs-title,
+.preview-content .hljs-section,
+.preview-content .hljs-selector-id {
+  color: #4ec9b0 !important;
+}
+
+.preview-content .hljs-number,
+.preview-content .hljs-literal {
+  color: #b5cea8 !important;
+}
+
+.preview-content .hljs-comment,
+.preview-content .hljs-quote {
+  color: #6a9955 !important;
+}
+
+.preview-content .hljs-variable,
+.preview-content .hljs-template-variable {
+  color: #9cdcfe !important;
+}
+
+.preview-content .hljs-regexp,
+.preview-content .hljs-link {
+  color: #d16969 !important;
+}
+
+.preview-content .hljs-meta {
+  color: #9b9b9b !important;
+}
+
+.preview-content .hljs-built_in,
+.preview-content .hljs-type {
+  color: #4ec9b0 !important;
+}
+
+.preview-content .hljs-attr,
+.preview-content .hljs-attribute {
+  color: #9cdcfe !important;
+}
+
+.preview-content .hljs-symbol,
+.preview-content .hljs-bullet {
+  color: #d7ba7d !important;
+}
+
+.preview-content .hljs-emphasis {
+  font-style: italic !important;
+}
+
+.preview-content .hljs-strong {
+  font-weight: bold !important;
+}
+
+/* Preview toolbar */
+.preview-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 12px 24px;
+  border-bottom: 1px solid var(--border-color);
+  background-color: var(--bg-secondary);
+}
+
+.slide-navigation {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: linear-gradient(to bottom, #f3f1f1, #f3f1f1);
+  padding: 12px 24px;
+  border-radius: 18px;
+  box-shadow: 0 2px 8px rgba(172, 170, 170, 0.2),
+              inset 0 1px 1px rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(207, 201, 201, 0.05);
+}
+
+.slide-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.slide-actions .btn {
+  padding: 6px 12px;
+  min-width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+}
+
+.slide-navigation .btn {
+  padding: 6px 12px;
+  min-width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  background: linear-gradient(to bottom, #e4e1e1, #e4e1e1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 1px 3px rgba(230, 224, 224, 0.2);
+  transition: all 0.2s ease;
+}
+
+.slide-navigation .btn:hover {
+  background: linear-gradient(to bottom, #a1a0a0, #bdbbbb);
+  border-color: rgba(250, 248, 248, 0.15);
+  box-shadow: 0 2px 4px rgba(230, 229, 229, 0.3);
+  transform: translateY(-1px);
+}
+
+.slide-navigation .btn:active {
+  background: linear-gradient(to bottom, #e7e2e2, #e7e2e2);
+  transform: translateY(0);
+  box-shadow: 0 1px 2px rgba(245, 245, 245, 0.2);
+}
+
+/* Editor area */
+.editor-container {
+  width: 400px;
+  min-width: 320px;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--bg-primary);
+  height: 100%;
+  transition: background-color 0.3s ease;
+}
+
+.editor-header {
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.editor-title {
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  background: none;
+  border: none;
+  outline: none;
+  width: 100%;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.editor-title:focus {
+  background-color: var(--hover-color);
+}
+
+.editor-content {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-color);
+}
+
+/* Buttons */
+.btn {
+  padding: 8px 16px;
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.9rem;
+}
+
+.btn:hover {
+  background-color: var(--hover-color);
+  border-color: var(--accent-color);
+}
+
+.btn-primary {
+  background-color: var(--accent-color);
+  border-color: var(--accent-color);
+  color: white;
+}
+
+.btn-primary:hover {
+  opacity: 0.9;
+}
+
+/* Editor metadata styles */
+.metadata-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 1rem;
+  padding: 1rem;
+  background-color: var(--bg-secondary);
+  border-radius: 4px;
+}
+
+.metadata-group label {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.metadata-group input,
+.metadata-group textarea {
+  padding: 0.5rem;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: inherit;
+}
+
+.metadata-group textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.editor-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.editor-section label {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+/* Add slide button */
+.add-slide-btn {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 48px;
+  height: 48px;
+  border-radius: 24px;
+  background-color: var(--accent-color);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease;
+  font-size: 24px;
+  border: none;
+  z-index: 100;
+}
+
+.add-slide-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Slide Layouts */
+.slide-layout-default {
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 100%;
+}
+
+.slide-layout-title {
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  min-height: 100%;
+}
+
+.slide-layout-title h1 {
+  font-size: 3.5rem;
+  margin-bottom: 1rem;
+}
+
+.slide-layout-title p {
+  font-size: 1.5rem;
+  color: var(--text-secondary);
+}
+
+.slide-layout-code {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Center all content horizontally */
+  padding: 2rem;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.slide-layout-code .code-content {
+  flex: 1;
+  display: block;
+  padding: 0 2rem;
+  overflow-y: visible;
+  overflow-x: hidden;
+  height: auto;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  text-align: center; /* Center all text content */
+}
+
+/* Center all elements inside code layout */
+.slide-layout-code h1,
+.slide-layout-code h2,
+.slide-layout-code h3,
+.slide-layout-code h4,
+.slide-layout-code h5,
+.slide-layout-code h6,
+.slide-layout-code p,
+.slide-layout-code ul,
+.slide-layout-code ol,
+.slide-layout-code blockquote {
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 100%;
+}
+
+/* Center lists while keeping bullets/numbers */
+.slide-layout-code ul,
+.slide-layout-code ol {
+  display: inline-block;
+  text-align: left;
+  padding-left: 2em;
+  margin: 1em auto;
+}
+
+/* Keep code blocks left-aligned for readability */
+.slide-layout-code pre {
+  text-align: left;
+  margin: 1em auto;
+}
+
+.slide-layout-code .explanation {
+  width: 100%;
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background: var(--bg-secondary);
+  border-radius: 8px;
+  text-align: center;
+}
+
+.slide-layout-code .explanation h3 {
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.slide-layout-code .explanation-content {
+  text-align: center;
+}
+
+.slide-layout-code .explanation-content p,
+.slide-layout-code .explanation-content ul,
+.slide-layout-code .explanation-content ol {
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.slide-layout-code .explanation-content ul,
+.slide-layout-code .explanation-content ol {
+  display: inline-block;
+  text-align: left;
+  padding-left: 2em;
+  margin: 1em auto;
+}
+
+.slide-layout-split {
+  padding: 2rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  min-height: 100%;
+}
+
+.slide-layout-image {
+  padding: 2rem;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: 2rem;
+  min-height: 100%;
+}
+
+.slide-layout-image .image-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.slide-layout-image img {
+  max-width: 100%;
+  max-height: 60vh;
+  object-fit: contain;
+}
+
+.slide-layout-image .caption {
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+/* Responsive adjustments for layouts */
+@media (max-width: 768px) {
+  .slide-layout-code,
+  .slide-layout-split {
+    grid-template-columns: 1fr;
+  }
+
+  .slide-layout-title h1 {
+    font-size: 2.5rem;
+  }
+
+  .slide-layout-title p {
+    font-size: 1.2rem;
+  }
+}
+
+/* Fullscreen mode */
+.app-container.fullscreen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
+  background-color: var(--preview-bg); /* White background for fullscreen */
+  display: block; /* Changed from flex to block for better scrolling */
+  padding: 0;
+  margin: 0;
+  overflow-y: auto; /* This is the primary scroll container in fullscreen mode */
+  overflow-x: hidden; /* Hide horizontal overflow */
+}
+
+/* Fullscreen preview container styles */
+.fullscreen-preview-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: var(--bg-primary);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Add horizontal centering */
+  justify-content: center; /* Add vertical centering */
+  overflow: hidden;
+  will-change: transform;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Font size adjustments for fullscreen preview mode */
+.fullscreen-preview-container {
+  /* Maintain existing styles */
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: var(--bg-primary);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Add horizontal centering */
+  justify-content: center; /* Add vertical centering */
+  overflow: hidden;
+}
+
+/* Title font sizes in fullscreen mode */
+.fullscreen-preview-container h1 {
+  font-size: 3.5rem;
+  line-height: 1.2;
+  margin-bottom: 1.5rem;
+}
+
+.fullscreen-preview-container h2 {
+  font-size: 3rem;
+  line-height: 1.3;
+  margin-bottom: 1.25rem;
+}
+
+.fullscreen-preview-container h3 {
+  font-size: 2.5rem;
+  line-height: 1.4;
+  margin-bottom: 1rem;
+}
+
+.fullscreen-preview-container h4 {
+  font-size: 2rem;
+  line-height: 1.4;
+  margin-bottom: 0.75rem;
+}
+
+.fullscreen-preview-container h5 {
+  font-size: 1.75rem;
+  line-height: 1.4;
+  margin-bottom: 0.75rem;
+}
+
+.fullscreen-preview-container h6 {
+  font-size: 1.5rem;
+  line-height: 1.4;
+  margin-bottom: 0.75rem;
+}
+
+/* Body font sizes in fullscreen mode */
+.fullscreen-preview-container p {
+  font-size: 1.8rem;
+  line-height: 1.6;
+  margin-bottom: 1rem;
+}
+
+/* List font sizes in fullscreen mode */
+.fullscreen-preview-container ul,
+.fullscreen-preview-container ol {
+  font-size: 1.8rem;
+  line-height: 1.6;
+  margin: 1rem 0;
+  padding-left: 2.5rem;
+}
+
+.fullscreen-preview-container li {
+  margin-bottom: 0.75rem;
+}
+
+/* Code block font sizes in fullscreen mode */
+.fullscreen-preview-container pre {
+  font-size: 1.6rem;
+  line-height: 1.5;
+  padding: 2rem;
+}
+
+.fullscreen-preview-container code {
+  font-size: 1.6rem;
+}
+
+.fullscreen-preview-container p code {
+  font-size: 1.6rem;
+  padding: 0.3em 0.6em;
+}
+
+/* Table font sizes in fullscreen mode */
+.fullscreen-preview-container table {
+  font-size: 1.8rem;
+}
+
+.fullscreen-preview-container th,
+.fullscreen-preview-container td {
+  padding: 1rem 2rem;
+}
+
+/* Quote block font sizes in fullscreen mode */
+.fullscreen-preview-container blockquote {
+  font-size: 1.8rem;
+  line-height: 1.6;
+  padding: 1.5rem 2rem;
+  margin: 1.5rem 0;
+  border-left: 4px solid var(--accent-color);
+}
+
+/* Horizontal line styles in fullscreen mode */
+.fullscreen-preview-container hr {
+  margin: 2rem 0;
+  border: none;
+  border-top: 2px solid var(--border-color);
+}
+
+/* Link styles in fullscreen mode */
+.fullscreen-preview-container a {
+  font-size: 1.8rem;
+  color: var(--accent-color);
+  text-decoration: none;
+}
+
+.fullscreen-preview-container a:hover {
+  text-decoration: underline;
+}
+
+/* Strong text styles in fullscreen mode */
+.fullscreen-preview-container strong {
+  font-weight: 600;
+}
+
+.fullscreen-preview-container em {
+  font-style: italic;
+}
+
+/* Image caption styles in fullscreen mode */
+.fullscreen-preview-container img + em {
+  font-size: 1.6rem;
+  color: var(--text-secondary);
+  display: block;
+  text-align: center;
+  margin-top: 1rem;
+}
+
+/* Slide preview component styles */
+.slide-preview-component {
+  flex: 1;
+  width: 100%;
+  max-width: 1200px; /* Limit maximum width */
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 2rem;
+  overflow-y: auto;
+  position: relative;
+  margin: 0 auto; /* Horizontal centering */
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Slide layout styles */
+.slide-layout-default,
+.slide-layout-title,
+.slide-layout-code,
+.slide-layout-split,
+.slide-layout-image {
+  width: 100%;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Add horizontal centering */
+  justify-content: center; /* Add vertical centering */
+  padding: 1rem;
+  overflow-y: auto;
+}
+
+/* Content wrapper styles */
+.content-wrapper {
+  flex: 1;
+  width: 100%;
+  max-width: 1000px; /* Limit content maximum width */
+  overflow-y: auto;
+  padding: 1rem;
+  margin: 0 auto; /* Horizontal centering */
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Add horizontal centering */
+}
+
+/* Fullscreen mode special layout styles */
+.fullscreen-preview-container .slide-layout-default,
+.fullscreen-preview-container .slide-layout-title,
+.fullscreen-preview-container .slide-layout-code,
+.fullscreen-preview-container .slide-layout-split,
+.fullscreen-preview-container .slide-layout-image {
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.fullscreen-preview-container .content-wrapper {
+  /* justify-content: center; */
+  align-items: center;
+  text-align: center;
+}
+
+/* Ensure fullscreen mode code blocks and tables can be centered */
+.fullscreen-preview-container pre,
+.fullscreen-preview-container table {
+  margin: 1rem auto;
+  max-width: 90%;
+}
+
+/* Fullscreen switch animation */
+.fullscreen-enter {
+  opacity: 0;
+  transform: scale(0.95);
+}
+
+.fullscreen-enter-active {
+  opacity: 1;
+  transform: scale(1);
+  transition: opacity 300ms ease-out, transform 300ms ease-out;
+}
+
+.fullscreen-exit {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.fullscreen-exit-active {
+  opacity: 0;
+  transform: scale(0.95);
+  transition: opacity 300ms ease-in, transform 300ms ease-in;
+}
+
+/* Slide switch animation */
+.slide-enter {
+  opacity: 0;
+  transform: translateX(100%);
+}
+
+.slide-enter-active {
+  opacity: 1;
+  transform: translateX(0);
+  transition: opacity 500ms ease-out, transform 500ms ease-out;
+}
+
+.slide-exit {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.slide-exit-active {
+  opacity: 0;
+  transform: translateX(-100%);
+  transition: opacity 500ms ease-in, transform 500ms ease-in;
+}
+
+.slide-prev-enter {
+  opacity: 0;
+  transform: translateX(-100%);
+}
+
+.slide-prev-enter-active {
+  opacity: 1;
+  transform: translateX(0);
+  transition: opacity 500ms ease-out, transform 500ms ease-out;
+}
+
+.slide-prev-exit {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.slide-prev-exit-active {
+  opacity: 0;
+  transform: translateX(100%);
+  transition: opacity 500ms ease-in, transform 500ms ease-in;
+}
+
+/* Ensure animation container styles correct */
+.fullscreen-preview-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: var(--bg-primary);
+  z-index: 1000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+.preview-content {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.slide-preview-component {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Ensure code blocks can be horizontally scrolled */
+.slide-preview-component pre {
+  max-width: 100%;
+  overflow-x: auto;
+  margin: 1rem 0;
+  padding: 1rem;
+  background-color: #1e1e1e; /* Use VS Code style black background */
+  border-radius: 4px;
+}
+
+/* Ensure tables can be horizontally scrolled */
+.slide-preview-component table {
+  width: 100%;
+  overflow-x: auto;
+  display: block;
+  margin: 1rem 0;
+}
+
+/* Adjust title styles to ensure not too close to top */
+.slide-preview-component h1,
+.slide-preview-component h2,
+.slide-preview-component h3,
+.slide-preview-component h4,
+.slide-preview-component h5,
+.slide-preview-component h6 {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  scroll-margin-top: 1rem; /* Ensure scroll to title does not get too close to top */
+}
+
+/* Adjust list styles */
+.slide-preview-component ul,
+.slide-preview-component ol {
+  margin: 1rem 0;
+  padding-left: 2rem;
+}
+
+/* Adjust paragraph styles */
+.slide-preview-component p {
+  margin: 1rem 0;
+}
+
+/* Code block base styles */
+.slide-preview-component pre,
+.fullscreen-preview-container pre {
+  width: 90%;
+  max-width: 1200px;
+  margin: 1rem auto;
+  padding: 1.5rem;
+  background-color: #1e1e1e; /* Use VS Code style black background */
+  border-radius: 8px;
+  overflow-x: auto;
+  font-family: 'Fira Code', 'Consolas', monospace;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: #d4d4d4;
+  text-align: left;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Inline code block styles */
+.slide-preview-component p code,
+.fullscreen-preview-container p code {
+  background-color: #1e1e1e; /* Use inline code background color */
+  color: #d4d4d4;
+  padding: 0.2em 0.4em;
+  border-radius: 4px;
+  font-size: 0.9em;
+}
+
+/* Code block syntax highlighting styles */
+.slide-preview-component .hljs,
+.fullscreen-preview-container .hljs {
+  background: transparent;
+  color: inherit;
+}
+
+/* Code block scrollbar styles */
+.slide-preview-component pre::-webkit-scrollbar,
+.fullscreen-preview-container pre::-webkit-scrollbar {
+  height: 8px;
+  background-color: transparent;
+}
+
+.slide-preview-component pre::-webkit-scrollbar-thumb,
+.fullscreen-preview-container pre::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+}
+
+.slide-preview-component pre::-webkit-scrollbar-track,
+.fullscreen-preview-container pre::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+
+/* Code block syntax highlighting colors */
+.slide-preview-component .hljs-keyword,
+.fullscreen-preview-container .hljs-keyword,
+.slide-preview-component .hljs-selector-tag,
+.fullscreen-preview-container .hljs-selector-tag {
+  color: #569cd6;
+}
+
+.slide-preview-component .hljs-string,
+.fullscreen-preview-container .hljs-string,
+.slide-preview-component .hljs-doctag,
+.fullscreen-preview-container .hljs-doctag {
+  color: #ce9178;
+}
+
+.slide-preview-component .hljs-title,
+.fullscreen-preview-container .hljs-title,
+.slide-preview-component .hljs-section,
+.fullscreen-preview-container .hljs-section {
+  color: #4ec9b0;
+}
+
+.slide-preview-component .hljs-number,
+.fullscreen-preview-container .hljs-number,
+.slide-preview-component .hljs-literal,
+.fullscreen-preview-container .hljs-literal {
+  color: #b5cea8;
+}
+
+.slide-preview-component .hljs-comment,
+.fullscreen-preview-container .hljs-comment {
+  color: #6a9955;
+  font-style: italic;
+}
+
+.slide-preview-component .hljs-variable,
+.fullscreen-preview-container .hljs-variable,
+.slide-preview-component .hljs-template-variable,
+.fullscreen-preview-container .hljs-template-variable {
+  color: #9cdcfe;
+}
+
+.slide-preview-component .hljs-regexp,
+.fullscreen-preview-container .hljs-regexp,
+.slide-preview-component .hljs-link,
+.fullscreen-preview-container .hljs-link {
+  color: #d16969;
+}
+
+.slide-preview-component .hljs-meta,
+.fullscreen-preview-container .hljs-meta {
+  color: #9b9b9b;
+}
+
+.slide-preview-component .hljs-built_in,
+.fullscreen-preview-container .hljs-built_in,
+.slide-preview-component .hljs-name,
+.fullscreen-preview-container .hljs-name {
+  color: #4ec9b0;
+}
+
+.slide-preview-component .hljs-attr,
+.fullscreen-preview-container .hljs-attr {
+  color: #9cdcfe;
+}
+
+.slide-preview-component .hljs-symbol,
+.fullscreen-preview-container .hljs-symbol,
+.slide-preview-component .hljs-bullet,
+.fullscreen-preview-container .hljs-bullet {
+  color: #d7ba7d;
+}
+
+/* Code block dark theme adaptation */
+[data-theme="dark"] .slide-preview-component pre,
+[data-theme="dark"] .fullscreen-preview-container pre {
+  background-color: #1e1e1e;
+  color: #d4d4d4;
+}
+
+[data-theme="dark"] .slide-preview-component p code,
+[data-theme="dark"] .fullscreen-preview-container p code {
+  background-color: #1e1e1e;
+  color: #d4d4d4;
+}
+
+/* Table base styles */
+.slide-preview-component table,
+.fullscreen-preview-container table {
+  width: auto;
+  margin: 1rem auto; /* Use auto margin for horizontal centering */
+  border-collapse: collapse;
+  text-align: center;
+  font-size: 1.6rem;
+  display: table; /* Ensure table displays correctly */
+}
+
+/* Table container styles */
+.slide-preview-component .table-container,
+.fullscreen-preview-container .table-container {
+  width: 100%;
+  overflow-x: auto;
+  display: flex;
+  justify-content: center; /* Horizontal centering */
+  margin: 1rem 0;
+}
+
+/* Table cell styles */
+.slide-preview-component th,
+.slide-preview-component td,
+.fullscreen-preview-container th,
+.fullscreen-preview-container td {
+  padding: 0.75rem 1.5rem;
+  border: 1px solid var(--border-color);
+  min-width: 120px; /* Ensure cell has minimum width */
+}
+
+/* Table title styles */
+.slide-preview-component th,
+.fullscreen-preview-container th {
+  background-color: var(--bg-secondary);
+  font-weight: bold;
+}
+
+/* Table row styles */
+.slide-preview-component tr:nth-child(even),
+.fullscreen-preview-container tr:nth-child(even) {
+  background-color: var(--bg-secondary);
+}
+
+/* Ensure table centered in content wrapper */
+.content-wrapper table {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Ensure table centered in slide layout */
+.slide-layout-default table,
+.slide-layout-title table,
+.slide-layout-code table,
+.slide-layout-split table,
+.slide-layout-image table {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Page number styles */
+.slide-preview-component.fullscreen {
+  position: relative;
+}
+
+.slide-page-number {
+  position: absolute;
+  top: 1.5rem;
+  left: 2rem;
+  font-size: 1.2rem;
+  color: rgba(128, 128, 128, 0.6);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  z-index: 10;
+  user-select: none;
+  pointer-events: none;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* Dark theme support for page number */
+@media (prefers-color-scheme: dark) {
+  .slide-page-number {
+    color: rgba(192, 192, 192, 0.5);
+  }
+}
+
+/* Progress bar styles */
+.slide-progress-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background-color: rgba(255, 255, 255, 0.1);
+  z-index: 1000;
+  backdrop-filter: blur(4px);
+  transition: opacity 0.3s ease;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    rgba(0, 0, 0, 0.8) 0%,
+    rgba(0, 0, 0, 0.8) 50%,
+    rgba(0, 0, 0, 0.8) 100%
+  );
+  transition: width 0.3s ease-out;
+  border-radius: 0 2px 2px 0;
+  box-shadow: 0 0 8px rgba(64, 156, 255, 0.3);
+  will-change: width;
+}
+
+/* Dark theme support for progress bar */
+@media (prefers-color-scheme: dark) {
+  .slide-progress-bar {
+    background-color: rgba(0, 0, 0, 0.2);
+  }
+  
+
+}
+
+/* Ensure progress bar doesn't interfere with content */
+.slide-preview-component.fullscreen {
+  padding-bottom: 4px;
+}
+
+/* Slide transition animations */
+.slide-fade-enter {
+  opacity: 0;
+  transform: scale(0.98);
+}
+
+.slide-fade-enter-active {
+  opacity: 1;
+  transform: scale(1);
+  transition: opacity 300ms ease-out, transform 300ms ease-out;
+}
+
+.slide-fade-exit {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.slide-fade-exit-active {
+  opacity: 0;
+  transform: scale(0.98);
+  transition: opacity 300ms ease-in, transform 300ms ease-in;
+}
+
+/* Ensure smooth animations */
+.slide-preview-component {
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Optimize fullscreen container */
+.fullscreen-preview-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: var(--bg-primary);
+  z-index: 1000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  will-change: transform;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Remove old slide transition animations */
+.slide-enter,
+.slide-enter-active,
+.slide-exit,
+.slide-exit-active,
+.slide-prev-enter,
+.slide-prev-enter-active,
+.slide-prev-exit,
+.slide-prev-exit-active {
+  display: none;
+}
