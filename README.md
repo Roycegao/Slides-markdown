@@ -32,8 +32,8 @@ See [Backend README](./backend/README.md) for:
 
 1. Clone the repository:
    ```bash
-   git clone <repository-url>
-   cd slides
+   git clone https://github.com/Roycegao/Slides-markdown.git
+   cd Slides-markdown
    ```
 
 2. Install dependencies for both frontend and backend:
