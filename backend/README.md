@@ -253,7 +253,3 @@ const newSlide = await fetch('http://localhost:3000/api/slides', {
 
 MIT License - see LICENSE file for details
 5. Open a Pull Request
-
-## 📞 Support
-
-For support, please open an issue in the repository or contact the maintainers. 
