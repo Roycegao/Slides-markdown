@@ -4,44 +4,118 @@ const { Sequelize, DataTypes } = require('sequelize');
 const path = require('path');
 
 const app = express();
+
+// 基础中间件
 app.use(cors());
 app.use(express.json());
 
+// 数据库配置 - 延迟初始化
+let sequelize = null;
+let Slide = null;
+let dbInitialized = false;
+
+// 初始化数据库连接
+async function getDatabase() {
+  if (!sequelize) {
+    sequelize = new Sequelize({
+      dialect: 'sqlite',
+      storage: process.env.VERCEL ? ':memory:' : path.join(__dirname, 'database.sqlite'),
+      logging: false,
+      pool: {
+        max: 1,
+        min: 0,
+        acquire: 30000,
+        idle: 10000
+      }
+    });
+
+    // 定义模型
+    Slide = sequelize.define('Slide', {
+      order: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
+      content: {
+        type: DataTypes.TEXT,
+        allowNull: false,
+      },
+      metadata: {
+        type: DataTypes.JSON,
+        defaultValue: {}
+      }
+    });
+  }
+  return { sequelize, Slide };
+}
+
+// 健康检查端点 - 不依赖数据库
+app.get('/health', (req, res) => {
+  res.json({ 
+    status: 'healthy',
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV,
+    memory: process.memoryUsage()
+  });
+});
+
+// 根路径处理 - 不依赖数据库
+app.get('/', (req, res) => {
+  res.json({ 
+    status: 'ok',
+    message: 'Slides API is running',
+    version: '1.0.0',
+    environment: process.env.NODE_ENV,
+    endpoints: {
+      slides: '/slides',
+      health: '/health'
+    }
+  });
+});
+
+// 数据库初始化函数
+async function initializeDatabase() {
+  if (dbInitialized) return;
+  
+  try {
+    const { sequelize, Slide } = await getDatabase();
+    
+    // 测试连接
+    await sequelize.authenticate();
+    console.log('Database connection established.');
+    
+    // 同步模型
+    await sequelize.sync({ force: true });
+    
+    // 检查是否需要初始化数据
+    const count = await Slide.count();
+    if (count === 0) {
+      // 分批插入数据以减少内存使用
+      const batchSize = 5;
+      for (let i = 0; i < defaultSlides.length; i += batchSize) {
+        const batch = defaultSlides.slice(i, i + batchSize);
+        await Slide.bulkCreate(batch);
+      }
+      console.log('Default slides initialized successfully');
+    }
+    
+    dbInitialized = true;
+  } catch (error) {
+    console.error('Database initialization error:', error);
+    throw error;
+  }
+}
+
+// 全局错误处理
 app.use((err, req, res, next) => {
   console.error('Global error:', err);
   res.status(500).json({ 
     error: 'Internal Server Error',
-    message: process.env.NODE_ENV === 'development' ? err.message : 'Something went wrong'
+    message: process.env.NODE_ENV === 'development' ? err.message : 'Something went wrong',
+    timestamp: new Date().toISOString()
   });
 });
 
-const sequelize = new Sequelize({
-  dialect: 'sqlite',
-  storage: process.env.VERCEL ? ':memory:' : path.join(__dirname, 'database.sqlite'),
-  logging: false 
-});
-
-// Slide 
-const Slide = sequelize.define('Slide', {
-  order: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-  },
-  content: {
-    type: DataTypes.TEXT,
-    allowNull: false,
-  },
-  // layout: {
-  //   type: DataTypes.STRING,
-  //   defaultValue: 'default', 
-  // },
-  metadata: {
-    type: DataTypes.JSON,
-    defaultValue: {}
-  }
-});
-
-
+// 默认幻灯片数据
 const defaultSlides = [
   {
     order: 1,
@@ -105,58 +179,15 @@ const defaultSlides = [
   }
 ];
 
-
-let dbInitialized = false;
-async function initializeDatabase() {
-  if (dbInitialized) return;
-  
-  try {
-    await sequelize.authenticate();
-    console.log('Database connection established.');
-    
-    await sequelize.sync({ force: true });
-    const count = await Slide.count();
-    
-    if (count === 0) {
-      await Slide.bulkCreate(defaultSlides);
-      console.log('Default slides initialized successfully');
-    }
-    
-    dbInitialized = true;
-  } catch (error) {
-    console.error('Database initialization error:', error);
-    throw error; 
-  }
-}
-
-
-app.get('/health', (req, res) => {
-  res.json({ 
-    status: 'healthy',
-    timestamp: new Date().toISOString(),
-    environment: process.env.NODE_ENV
-  });
-});
-
-
-app.get('/', (req, res) => {
-  res.json({ 
-    status: 'ok',
-    message: 'Slides API is running',
-    version: '1.0.0',
-    environment: process.env.NODE_ENV,
-    endpoints: {
-      slides: '/slides',
-      health: '/health'
-    }
-  });
-});
-
-
+// API 路由处理
 app.get('/slides', async (req, res, next) => {
   try {
     await initializeDatabase();
-    const slides = await Slide.findAll({ order: [['order', 'ASC']] });
+    const { Slide } = await getDatabase();
+    const slides = await Slide.findAll({ 
+      order: [['order', 'ASC']],
+      attributes: ['id', 'order', 'content', 'metadata'] // 只选择需要的字段
+    });
     res.json(slides);
   } catch (error) {
     next(error);
@@ -166,7 +197,10 @@ app.get('/slides', async (req, res, next) => {
 app.get('/slides/:id', async (req, res, next) => {
   try {
     await initializeDatabase();
-    const slide = await Slide.findByPk(req.params.id);
+    const { Slide } = await getDatabase();
+    const slide = await Slide.findByPk(req.params.id, {
+      attributes: ['id', 'order', 'content', 'metadata']
+    });
     if (!slide) return res.status(404).json({ error: 'Slide not found' });
     res.json(slide);
   } catch (error) {
@@ -177,6 +211,7 @@ app.get('/slides/:id', async (req, res, next) => {
 app.post('/slides', async (req, res, next) => {
   try {
     await initializeDatabase();
+    const { Slide } = await getDatabase();
     const slide = await Slide.create(req.body);
     res.status(201).json(slide);
   } catch (error) {
@@ -187,6 +222,7 @@ app.post('/slides', async (req, res, next) => {
 app.put('/slides/:id', async (req, res, next) => {
   try {
     await initializeDatabase();
+    const { Slide } = await getDatabase();
     const slide = await Slide.findByPk(req.params.id);
     if (!slide) {
       return res.status(404).json({ error: 'Slide not found' });
@@ -201,6 +237,7 @@ app.put('/slides/:id', async (req, res, next) => {
 app.delete('/slides/:id', async (req, res, next) => {
   try {
     await initializeDatabase();
+    const { Slide } = await getDatabase();
     const slide = await Slide.findByPk(req.params.id);
     if (!slide) {
       return res.status(404).json({ error: 'Slide not found' });
@@ -212,10 +249,14 @@ app.delete('/slides/:id', async (req, res, next) => {
   }
 });
 
-
+// 启动服务器
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
-
-  initializeDatabase().catch(console.error);
+  // 不等待数据库初始化
+  process.nextTick(() => {
+    initializeDatabase().catch(error => {
+      console.error('Initial database initialization failed:', error);
+    });
+  });
 });
