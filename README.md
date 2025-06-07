@@ -6,17 +6,7 @@ A modern, full-stack presentation system built with React and Node.js, featuring
 
 This repository contains two main components:
 
-```
-slides/
-├── frontend/           # React-based frontend application
-│   ├── src/           # Source code
-│   ├── public/        # Static assets
-│   └── e2e/           # End-to-end tests
-│
-└── backend/           # Node.js backend server
-    ├── app.js         # Main application
-    └── __tests__/     # Backend tests
-```
+
 
 ## Documentation
 
