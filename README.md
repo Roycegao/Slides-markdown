@@ -77,5 +77,5 @@ See [Backend README](./backend/README.md) for:
 - Jest (Testing)
 
 ## AUther
-royce
-email: roycegao513@gmail.com
+- royce
+- email: roycegao513@gmail.com
