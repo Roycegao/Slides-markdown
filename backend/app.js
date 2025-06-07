@@ -4,28 +4,32 @@ const { Sequelize, DataTypes } = require('sequelize');
 const path = require('path');
 
 const app = express();
-app.use(cors());
+   app.use(cors({
+     origin: [
+       'https://slides-markdown-n3vz.vercel.app' 
+     ]
+   }));
 app.use(express.json());
 
-// SQLite 数据库初始化
+
 const sequelize = new Sequelize({
   dialect: 'sqlite',
   storage: path.join(__dirname, 'database.sqlite'),
 });
 
-// Slide 模型
+
 const Slide = sequelize.define('Slide', {
   order: {
     type: DataTypes.INTEGER,
     allowNull: false,
   },
   content: {
-    type: DataTypes.TEXT, // markdown 内容
+    type: DataTypes.TEXT, 
     allowNull: false,
   },
   // layout: {
   //   type: DataTypes.STRING,
-  //   defaultValue: 'default', // 支持不同布局
+  //   defaultValue: 'default', 
   // },
   metadata: {
     type: DataTypes.JSON,
@@ -33,7 +37,7 @@ const Slide = sequelize.define('Slide', {
   }
 });
 
-// 默认幻灯片数据
+
 const defaultSlides = [
   {
     order: 1,
@@ -97,10 +101,10 @@ const defaultSlides = [
   }
 ];
 
-// 初始化数据库
+
 async function initializeDatabase() {
   try {
-    await sequelize.sync({ force: true }); // 注意：这会清空现有数据
+    await sequelize.sync({ force: true });
     const count = await Slide.count();
     if (count === 0) {
       await Slide.bulkCreate(defaultSlides);
@@ -111,7 +115,6 @@ async function initializeDatabase() {
   }
 }
 
-// 路由 - 获取所有幻灯片，按顺序
 app.get('/slides', async (req, res) => {
   try {
     const slides = await Slide.findAll({ order: [['order', 'ASC']] });
@@ -121,14 +124,14 @@ app.get('/slides', async (req, res) => {
   }
 });
 
-// 路由 - 获取单个幻灯片
+
 app.get('/slides/:id', async (req, res) => {
   const slide = await Slide.findByPk(req.params.id);
   if (!slide) return res.status(404).json({ error: 'Slide not found' });
   res.json(slide);
 });
 
-// 路由 - 创建新幻灯片
+
 app.post('/slides', async (req, res) => {
   try {
     const slide = await Slide.create(req.body);
@@ -138,7 +141,7 @@ app.post('/slides', async (req, res) => {
   }
 });
 
-// 路由 - 更新幻灯片
+
 app.put('/slides/:id', async (req, res) => {
   try {
     const slide = await Slide.findByPk(req.params.id);
@@ -152,7 +155,7 @@ app.put('/slides/:id', async (req, res) => {
   }
 });
 
-// 路由 - 删除幻灯片
+
 app.delete('/slides/:id', async (req, res) => {
   try {
     const slide = await Slide.findByPk(req.params.id);
@@ -166,7 +169,6 @@ app.delete('/slides/:id', async (req, res) => {
   }
 });
 
-// 启动服务器
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, async () => {
   await initializeDatabase();
