@@ -75,3 +75,7 @@ See [Backend README](./backend/README.md) for:
 - Express
 - SQLite
 - Jest (Testing)
+
+## AUther
+royce
+email: roycegao513@gmail.com
