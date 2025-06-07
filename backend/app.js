@@ -4,11 +4,7 @@ const { Sequelize, DataTypes } = require('sequelize');
 const path = require('path');
 
 const app = express();
-   app.use(cors({
-     origin: [
-       'https://slides-markdown-n3vz.vercel.app' 
-     ]
-   }));
+app.use(cors());
 app.use(express.json());
 
 
@@ -102,8 +98,31 @@ const defaultSlides = [
 ];
 
 
+app.get('/', (req, res) => {
+  res.json({ 
+    status: 'ok',
+    message: 'Slides API is running',
+    version: '1.0.0',
+    endpoints: {
+      slides: '/slides',
+      health: '/health'
+    }
+  });
+});
+
+
+app.get('/health', (req, res) => {
+  res.json({ status: 'healthy' });
+});
+
 async function initializeDatabase() {
   try {
+
+    if (process.env.VERCEL) {
+      console.log('Running in Vercel environment, using in-memory database');
+      sequelize.options.storage = ':memory:';
+    }
+    
     await sequelize.sync({ force: true });
     const count = await Slide.count();
     if (count === 0) {
@@ -114,6 +133,7 @@ async function initializeDatabase() {
     console.error('Error initializing database:', error);
   }
 }
+
 
 app.get('/slides', async (req, res) => {
   try {
@@ -168,6 +188,7 @@ app.delete('/slides/:id', async (req, res) => {
     res.status(400).json({ error: error.message });
   }
 });
+
 
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, async () => {
