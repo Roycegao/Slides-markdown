@@ -13,42 +13,28 @@ app.use(express.json());
 const sequelize = new Sequelize({
   dialect: 'sqlite',
   storage: process.env.VERCEL ? ':memory:' : path.join(__dirname, 'database.sqlite'),
-  dialectModule: require('better-sqlite3'),
+  dialectModule: require('sqlite3'),
   logging: false
 });
 
-// 延迟初始化
-let Slide = null;
-let dbInitialized = false;
-
-// 初始化数据库连接
-async function getDatabase() {
-  if (!sequelize) {
-    sequelize = new Sequelize({
-      dialect: 'sqlite',
-      storage: process.env.VERCEL ? ':memory:' : path.join(__dirname, 'database.sqlite'),
-      dialectModule: require('better-sqlite3'),
-      logging: false
-    });
-
-    // 定义模型
-    Slide = sequelize.define('Slide', {
-      order: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-      },
-      content: {
-        type: DataTypes.TEXT,
-        allowNull: false,
-      },
-      metadata: {
-        type: DataTypes.JSON,
-        defaultValue: {}
-      }
-    });
+// Slide 模型
+const Slide = sequelize.define('Slide', {
+  order: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+  },
+  content: {
+    type: DataTypes.TEXT,
+    allowNull: false,
+  },
+  metadata: {
+    type: DataTypes.JSON,
+    defaultValue: {}
   }
-  return { sequelize, Slide };
-}
+});
+
+// 延迟初始化
+let dbInitialized = false;
 
 // 健康检查端点 - 不依赖数据库
 app.get('/health', (req, res) => {
@@ -79,8 +65,6 @@ async function initializeDatabase() {
   if (dbInitialized) return;
   
   try {
-    const { sequelize, Slide } = await getDatabase();
-    
     // 测试连接
     await sequelize.authenticate();
     console.log('Database connection established.');
@@ -185,7 +169,6 @@ const defaultSlides = [
 app.get('/slides', async (req, res, next) => {
   try {
     await initializeDatabase();
-    const { Slide } = await getDatabase();
     const slides = await Slide.findAll({ 
       order: [['order', 'ASC']],
       attributes: ['id', 'order', 'content', 'metadata'] // 只选择需要的字段
@@ -199,7 +182,6 @@ app.get('/slides', async (req, res, next) => {
 app.get('/slides/:id', async (req, res, next) => {
   try {
     await initializeDatabase();
-    const { Slide } = await getDatabase();
     const slide = await Slide.findByPk(req.params.id, {
       attributes: ['id', 'order', 'content', 'metadata']
     });
@@ -213,7 +195,6 @@ app.get('/slides/:id', async (req, res, next) => {
 app.post('/slides', async (req, res, next) => {
   try {
     await initializeDatabase();
-    const { Slide } = await getDatabase();
     const slide = await Slide.create(req.body);
     res.status(201).json(slide);
   } catch (error) {
@@ -224,7 +205,6 @@ app.post('/slides', async (req, res, next) => {
 app.put('/slides/:id', async (req, res, next) => {
   try {
     await initializeDatabase();
-    const { Slide } = await getDatabase();
     const slide = await Slide.findByPk(req.params.id);
     if (!slide) {
       return res.status(404).json({ error: 'Slide not found' });
@@ -239,7 +219,6 @@ app.put('/slides/:id', async (req, res, next) => {
 app.delete('/slides/:id', async (req, res, next) => {
   try {
     await initializeDatabase();
-    const { Slide } = await getDatabase();
     const slide = await Slide.findByPk(req.params.id);
     if (!slide) {
       return res.status(404).json({ error: 'Slide not found' });
