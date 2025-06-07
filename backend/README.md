@@ -58,13 +58,6 @@ cd backend
 # Install dependencies
 npm install
 
-# Set up environment variables
-cp .env.example .env
-# Edit .env with your configuration
-
-# Initialize the database
-npm run db:init
-
 # Start the development server
 npm run dev
 
@@ -76,23 +69,6 @@ npm test
 
 # Run tests with coverage
 npm run test:coverage
-```
-
-## 🎯 Project Structure
-
-```
-backend/
-├── src/
-│   ├── models/           # Database models
-│   ├── routes/           # API routes
-│   ├── controllers/      # Route controllers
-│   ├── middleware/       # Custom middleware
-│   ├── utils/            # Utility functions
-│   ├── config/           # Configuration files
-│   └── app.js           # Main application file
-├── __tests__/           # Test files
-├── migrations/          # Database migrations
-└── jest.config.js      # Jest configuration
 ```
 
 ## 📝 API Documentation
@@ -276,13 +252,6 @@ const newSlide = await fetch('http://localhost:3000/api/slides', {
 ## 📄 License
 
 MIT License - see LICENSE file for details
-
-## 👥 Contributing
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
 ## 📞 Support
