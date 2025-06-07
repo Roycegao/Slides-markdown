@@ -9,8 +9,15 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// 数据库配置 - 延迟初始化
-let sequelize = null;
+// 数据库配置
+const sequelize = new Sequelize({
+  dialect: 'sqlite',
+  storage: process.env.VERCEL ? ':memory:' : path.join(__dirname, 'database.sqlite'),
+  dialectModule: require('better-sqlite3'),
+  logging: false
+});
+
+// 延迟初始化
 let Slide = null;
 let dbInitialized = false;
 
@@ -20,13 +27,8 @@ async function getDatabase() {
     sequelize = new Sequelize({
       dialect: 'sqlite',
       storage: process.env.VERCEL ? ':memory:' : path.join(__dirname, 'database.sqlite'),
-      logging: false,
-      pool: {
-        max: 1,
-        min: 0,
-        acquire: 30000,
-        idle: 10000
-      }
+      dialectModule: require('better-sqlite3'),
+      logging: false
     });
 
     // 定义模型
