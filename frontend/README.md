@@ -56,10 +56,6 @@ A modern, responsive slide presentation editor built with React, featuring a ric
 
 ## 📦 Installation
 
-```bash
-# Clone the repository
-git clone <repository-url>
-
 # Navigate to the frontend directory
 cd frontend
 
@@ -82,22 +78,6 @@ npm run test:e2e
 npm run storybook
 ```
 
-## 🎯 Project Structure
-
-```
-frontend/
-├── src/
-│   ├── components/        # Reusable React components
-│   ├── styles/           # Global styles and themes
-│   ├── hooks/            # Custom React hooks
-│   ├── utils/            # Utility functions
-│   ├── contexts/         # React contexts
-│   └── App.jsx          # Main application component
-├── public/               # Static assets
-├── e2e/                  # End-to-end tests
-├── .storybook/          # Storybook configuration
-└── vite.config.js       # Vite configuration
-```
 
 ## 🎨 Customization
 
