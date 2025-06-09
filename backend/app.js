@@ -101,7 +101,7 @@ app.use((err, req, res, next) => {
 const defaultSlides = [
   {
     order: 1,
-    content: "# Markdown Slide Editor\n\nA Modern Presentation Tool Built with React \n ![image](https://media.tenor.com/mH_Sq3JI3jkAAAAj/helloworld-programming.gif)",
+    content: "# Markdown Slide Editor\n\nA Modern Presentation Tool Built with React \n  ![image](https://media.tenor.com/mH_Sq3JI3jkAAAAj/helloworld-programming.gif)",
 
     metadata: {}
   },
@@ -155,7 +155,7 @@ const defaultSlides = [
   },
   {
     order: 10,
-    content: "## 👨‍💻 Author\n\n- Name: **Royce**\n- Age: 34\n- Experience: 9 years full-stack development\n- Stack: Java (Spring), Python, React, MySQL, Node.js, LLM, RAG\n- Email: **roycegao513@gmail.com**\n\n🧠 Thank you for reading!\n ![image](https://pbs.twimg.com/profile_images/1723248873806942208/EalEraX0_400x400.jpg)",
+    content: "## 👨‍💻 Author\n\n- Name: **Royce**\n- Age: 34\n- Experience: 9 years full-stack development\n- Stack: Java (Spring), Python, React, MySQL, Node.js, LLM, RAG\n- Email: **roycegao513@gmail.com**\n\n🧠 Thank you for reading! \n  ![image](https://pbs.twimg.com/profile_images/1723248873806942208/EalEraX0_400x400.jpg)",
 
     metadata: {}
   }
