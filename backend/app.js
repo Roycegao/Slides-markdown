@@ -5,11 +5,9 @@ const path = require('path');
 
 const app = express();
 
-// 基础中间件
 app.use(cors());
 app.use(express.json());
 
-// 数据库配置
 const sequelize = new Sequelize({
   dialect: 'sqlite',
   storage: process.env.VERCEL ? ':memory:' : path.join(__dirname, 'database.sqlite'),
@@ -17,7 +15,6 @@ const sequelize = new Sequelize({
   logging: false
 });
 
-// Slide 模型
 const Slide = sequelize.define('Slide', {
   order: {
     type: DataTypes.INTEGER,
@@ -33,10 +30,9 @@ const Slide = sequelize.define('Slide', {
   }
 });
 
-// 延迟初始化
 let dbInitialized = false;
 
-// 健康检查端点 - 不依赖数据库
+
 app.get('/health', (req, res) => {
   res.json({ 
     status: 'healthy',
@@ -46,7 +42,7 @@ app.get('/health', (req, res) => {
   });
 });
 
-// 根路径处理 - 不依赖数据库
+
 app.get('/', (req, res) => {
   res.json({ 
     status: 'ok',
@@ -60,22 +56,22 @@ app.get('/', (req, res) => {
   });
 });
 
-// 数据库初始化函数
+
 async function initializeDatabase() {
   if (dbInitialized) return;
   
   try {
-    // 测试连接
+
     await sequelize.authenticate();
     console.log('Database connection established.');
     
-    // 同步模型
+
     await sequelize.sync({ force: true });
     
-    // 检查是否需要初始化数据
+
     const count = await Slide.count();
     if (count === 0) {
-      // 分批插入数据以减少内存使用
+
       const batchSize = 5;
       for (let i = 0; i < defaultSlides.length; i += batchSize) {
         const batch = defaultSlides.slice(i, i + batchSize);
@@ -91,7 +87,7 @@ async function initializeDatabase() {
   }
 }
 
-// 全局错误处理
+
 app.use((err, req, res, next) => {
   console.error('Global error:', err);
   res.status(500).json({ 
@@ -101,7 +97,7 @@ app.use((err, req, res, next) => {
   });
 });
 
-// 默认幻灯片数据
+
 const defaultSlides = [
   {
     order: 1,
@@ -165,13 +161,13 @@ const defaultSlides = [
   }
 ];
 
-// API 路由处理
+
 app.get('/slides', async (req, res, next) => {
   try {
     await initializeDatabase();
     const slides = await Slide.findAll({ 
       order: [['order', 'ASC']],
-      attributes: ['id', 'order', 'content', 'metadata'] // 只选择需要的字段
+      attributes: ['id', 'order', 'content', 'metadata']
     });
     res.json(slides);
   } catch (error) {
@@ -230,11 +226,11 @@ app.delete('/slides/:id', async (req, res, next) => {
   }
 });
 
-// 启动服务器
+
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
-  // 不等待数据库初始化
+
   process.nextTick(() => {
     initializeDatabase().catch(error => {
       console.error('Initial database initialization failed:', error);
