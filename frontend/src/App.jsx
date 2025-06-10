@@ -313,8 +313,8 @@ export default function App() {
       {/* 竖屏时显示顶部tab，横屏时隐藏 */}
       {isMobile && !isLandscapeMode && !isFullscreen && (
         <div style={{ display: 'flex', width: '100vw', borderBottom: '1px solid #eee', background: 'var(--bg-secondary)', zIndex: 10 }}>
-          <button className={`btn${mobileTab === 'sidebar' ? ' btn-primary' : ''}`} style={{ flex: 1 }} onClick={() => setMobileTab('sidebar')}>目录</button>
-          <button className={`btn${mobileTab === 'editor' ? ' btn-primary' : ''}`} style={{ flex: 1 }} onClick={() => setMobileTab('editor')}>编辑</button>
+          <button className={`btn${mobileTab === 'sidebar' ? ' btn-primary' : ''}`} style={{ flex: 1 }} onClick={() => setMobileTab('sidebar')}>Slides</button>
+          <button className={`btn${mobileTab === 'editor' ? ' btn-primary' : ''}`} style={{ flex: 1 }} onClick={() => setMobileTab('editor')}>Edit</button>
         </div>
       )}
       <HotKeys
@@ -341,8 +341,8 @@ export default function App() {
                   width: 40, height: 40, border: 'none', background: 'rgba(0,0,0,0.1)', color: '#fff', borderRadius: '50%', fontSize: 24, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 8px rgba(0,0,0,0.15)', cursor: 'pointer'
                 }}
                 onClick={() => setIsFullscreen(false)}
-                aria-label="返回"
-                title="返回"
+                aria-label="back"
+                title="back"
               >
                 <BackIcon style={{ width: 20, height: 20 }} />
               </button>
@@ -387,13 +387,13 @@ export default function App() {
             <div className="sidebar-header">
               <h1 className="sidebar-title">Slides</h1>
               <div className="slide-navigation">
-                <button className="btn" onClick={addNewSlide} title="添加幻灯片">
+                <button className="btn" onClick={addNewSlide} title="Add Slide">
                   <AddIcon />
                 </button>
-                <button className="btn" onClick={() => deleteSlide(currentSlideId)} disabled={!canDelete} title="删除幻灯片">
+                <button className="btn" onClick={() => deleteSlide(currentSlideId)} disabled={!canDelete} title="Delete Slide">
                   <RemoveIcon />
                 </button>
-                <button className="btn" onClick={() => handleToggleFullscreen('button')} title={isFullscreen ? '退出全屏' : '全屏预览'}>
+                <button className="btn" onClick={() => handleToggleFullscreen('button')} title={isFullscreen ? 'esc' : 'preview'}>
                   {isFullscreen ? <FullscreenExitIcon /> : <FullscreenIcon />}
                 </button>
               </div>
@@ -446,13 +446,13 @@ export default function App() {
             <div className="sidebar-header">
               <h1 className="sidebar-title">Slides</h1>
               <div className="slide-navigation">
-                <button className="btn" onClick={addNewSlide} title="添加幻灯片">
+                <button className="btn" onClick={addNewSlide} title="Add Slide">
                   <AddIcon />
                 </button>
-                <button className="btn" onClick={() => deleteSlide(currentSlideId)} disabled={!canDelete} title="删除幻灯片">
+                <button className="btn" onClick={() => deleteSlide(currentSlideId)} disabled={!canDelete} title="Delete Slide">
                   <RemoveIcon />
                 </button>
-                <button className="btn" onClick={() => handleToggleFullscreen('button')} title={isFullscreen ? '退出全屏' : '全屏预览'}>
+                <button className="btn" onClick={() => handleToggleFullscreen('button')} title={isFullscreen ? 'esc' : 'preview'}>
                   {isFullscreen ? <FullscreenExitIcon /> : <FullscreenIcon />}
                 </button>
               </div>
@@ -521,8 +521,8 @@ export default function App() {
               cursor: 'pointer',
               fontSize: '1.2em'
             }}
-            aria-label="关闭"
-            title="关闭"
+            aria-label="Close"
+            title="Close"
           >
             <CloseIcon style={{ width: 20, height: 20 }} />
           </button>
@@ -535,19 +535,19 @@ export default function App() {
             <div className="sidebar-header">
               <h1 className="sidebar-title">Slides</h1>
               <div className="slide-navigation">
-                <button className="btn" onClick={handlePrev} title="上一页">
+                <button className="btn" onClick={handlePrev} title="Previous">
                   <UpIcon />
                 </button>
-                <button className="btn" onClick={addNewSlide} title="添加幻灯片">
+                <button className="btn" onClick={addNewSlide} title="Add Slide">
                   <AddIcon />
                 </button>
-                <button className="btn" onClick={() => deleteSlide(currentSlideId)} disabled={!canDelete} title="删除幻灯片">
+                <button className="btn" onClick={() => deleteSlide(currentSlideId)} disabled={!canDelete} title="Delete Slide">
                   <RemoveIcon />
                 </button>
-                <button className="btn" onClick={() => handleToggleFullscreen('button')} title={isFullscreen ? '退出全屏' : '全屏预览'}>
+                <button className="btn" onClick={() => handleToggleFullscreen('button')} title={isFullscreen ? 'esc' : 'preview'}>
                   {isFullscreen ? <FullscreenExitIcon /> : <FullscreenIcon />}
                 </button>
-                <button className="btn" onClick={handleNext} title="下一页">
+                <button className="btn" onClick={handleNext} title="Next">
                   <DownIcon />
                 </button>
               </div>
