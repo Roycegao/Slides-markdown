@@ -251,11 +251,16 @@ export default function App() {
 
   // 滑动手势处理（仅移动端全屏预览）
   const touchStartX = useRef(null);
+  const touchStartY = useRef(null);
   const touchEndX = useRef(null);
+  const touchEndY = useRef(null);
+
   const handleTouchStart = (e) => {
     if (!isMobile || !isFullscreen) return;
     touchStartX.current = e.touches[0].clientX;
+    touchStartY.current = e.touches[0].clientY;
   };
+
   const handleTouchEnd = (e) => {
     if (!isMobile || !isFullscreen) return;
     // 判断是否在可横向滚动的内容（代码块、表格等）内
@@ -275,9 +280,15 @@ export default function App() {
       el = el.parentElement;
     }
     if (blockScroll) return;
+
     touchEndX.current = e.changedTouches[0].clientX;
+    touchEndY.current = e.changedTouches[0].clientY;
+    
     const deltaX = touchEndX.current - touchStartX.current;
-    if (Math.abs(deltaX) > 30) {
+    const deltaY = touchEndY.current - touchStartY.current;
+    
+    // 只有当水平滑动距离大于垂直滑动距离，且水平滑动距离超过阈值时才触发翻页
+    if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 30) {
       if (deltaX < 0 && canNext) handleNext(); // 左滑，下一页
       if (deltaX > 0 && canPrev) handlePrev(); // 右滑，上一页
     }
