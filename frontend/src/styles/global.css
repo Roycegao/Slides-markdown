@@ -764,8 +764,23 @@ body {
     display: flex !important;
     flex-direction: column;
   }
+  /* 移动端竖屏时，让sidebar-header固定在顶部 */
+  .sidebar.active {
+    height: 100vh !important;
+    overflow: hidden;
+  }
   .sidebar-header {
     padding: 12px;
+    flex-shrink: 0; /* 防止header被压缩 */
+    background-color: var(--bg-secondary);
+    border-bottom: 1px solid var(--border-color);
+    z-index: 10;
+  }
+  .slides-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 10px;
+    min-height: 0; /* 允许内容区域收缩 */
   }
  
   .slide-item {
@@ -1778,11 +1793,45 @@ body {
     overflow-y: auto;
     min-height: 0;
   }
+
+  /* 横屏模式下全屏预览的代码块样式，与竖屏模式保持一致 */
+  .fullscreen-preview-container pre {
+    font-size: 3.5vw;
+    padding: 0.7rem 0.5rem;
+    border-radius: 8px;
+    margin: 1em 0;
+    background: #181c24;
+    max-width: 100vw;
+    overflow-x: auto;
+    word-break: break-all;
+  }
+  .fullscreen-preview-container pre code {
+    font-size: 3.5vw;
+    background: none;
+    color: inherit;
+    padding: 0;
+  }
+}
+
+/* 全屏模式下的代码块样式 */
+.fullscreen-preview-container pre {
+  width: 80%;
+  max-width: 1200px;
+  font-size: 1em;
+  padding: 1.5em;
+}
+
+/* 移动端全屏模式下的代码块样式 */
+@media (max-width: 768px) {
+  .fullscreen-preview-container pre {
+    width: 90%;
+    font-size: 0.85em;
+    padding: 1.2em;
+  }
 }
 
 /* 代码块基础样式 */
-.slide-preview-component pre,
-.fullscreen-preview-container pre {
+.slide-preview-component pre {
   width: 80%;
   max-width: 1200px;
   margin: 1rem auto;
@@ -1800,8 +1849,7 @@ body {
 }
 
 /* 行内代码样式 */
-.slide-preview-component p code,
-.fullscreen-preview-container p code {
+.slide-preview-component p code {
   background-color: #1e1e1e;
   color: #d4d4d4;
   padding: 0.2em 0.4em;
@@ -1815,8 +1863,7 @@ body {
 }
 
 /* 代码块语法高亮样式 */
-.slide-preview-component .hljs,
-.fullscreen-preview-container .hljs {
+.slide-preview-component .hljs {
   background: transparent !important;
   color: inherit !important;
   white-space: pre-wrap;
@@ -1825,26 +1872,22 @@ body {
 }
 
 /* 代码块滚动条样式 */
-.slide-preview-component pre::-webkit-scrollbar,
-.fullscreen-preview-container pre::-webkit-scrollbar {
+.slide-preview-component pre::-webkit-scrollbar {
   height: 8px;
   background-color: transparent;
 }
 
-.slide-preview-component pre::-webkit-scrollbar-thumb,
-.fullscreen-preview-container pre::-webkit-scrollbar-thumb {
+.slide-preview-component pre::-webkit-scrollbar-thumb {
   background-color: rgba(255, 255, 255, 0.2);
   border-radius: 4px;
 }
 
-.slide-preview-component pre::-webkit-scrollbar-track,
-.fullscreen-preview-container pre::-webkit-scrollbar-track {
+.slide-preview-component pre::-webkit-scrollbar-track {
   background-color: transparent;
 }
 
 /* 确保代码块内容不会溢出 */
-.slide-preview-component pre code,
-.fullscreen-preview-container pre code {
+.slide-preview-component pre code {
   white-space: pre;
   word-wrap: normal;
   overflow-x: auto;
@@ -1877,15 +1920,13 @@ body {
 
 /* 响应式调整 */
 @media (max-width: 768px) {
-  .slide-preview-component pre,
-  .fullscreen-preview-container pre {
+  .slide-preview-component pre {
     width: 90%;
     font-size: 0.85em;
     padding: 1.2em;
   }
   
-  .slide-preview-component p code,
-  .fullscreen-preview-container p code {
+  .slide-preview-component p code {
     font-size: 0.85em;
   }
   
@@ -1895,45 +1936,17 @@ body {
 }
 
 @media (max-width: 1024px) and (orientation: landscape) {
-  .slide-preview-component pre,
-  .fullscreen-preview-container pre {
+  .slide-preview-component pre {
     width: 85%;
     font-size: 0.9em;
     padding: 1.3em;
   }
   
-  .slide-preview-component p code,
-  .fullscreen-preview-container p code {
+  .slide-preview-component p code {
     font-size: 0.9em;
   }
   
   .slide-layout-code {
     padding: 0.8rem;
-  }
-}
-
-/* 全屏模式下的代码块样式 */
-.fullscreen-preview-container pre {
-  width: 80%;
-  max-width: 1200px;
-  font-size: 1em;
-  padding: 1.5em;
-}
-
-/* 移动端全屏模式下的代码块样式 */
-@media (max-width: 768px) {
-  .fullscreen-preview-container pre {
-    width: 90%;
-    font-size: 0.85em;
-    padding: 1.2em;
-  }
-}
-
-/* 移动端横屏全屏模式下的代码块样式 */
-@media (max-width: 1024px) and (orientation: landscape) {
-  .fullscreen-preview-container pre {
-    width: 85%;
-    font-size: 0.9em;
-    padding: 1.3em;
   }
 }
