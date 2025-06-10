@@ -107,49 +107,49 @@ const defaultSlides = [
   },
   {
     order: 2,
-    content: "## 🎯 Core Features\n\n- ✨ Real-time Markdown editing with live preview\n- 🎨 Multiple slide layouts (Title, Code, Split, Image)\n- 🖱️ Drag-and-drop slide reordering\n- ⌨️ Keyboard shortcuts for navigation\n- 🎭 Smooth slide transitions & animations\n- 📱 Responsive & mobile-friendly design\n- 💾 Auto-save with backend persistence",
+    content: "## 🎯 Core Features\n\n- ✨ Real-time Markdown editing with live preview\n- 🎨 Multiple slide layouts (Title, Code, Split, Image) \n- ⌨️ Keyboard shortcuts for navigation \n- 🎭 Smooth slide transitions with react-transition-group\n- 📱 Responsive design with mobile-first approach\n- 💾 Auto-save with debounced backend persistence\n- 🖥️ Fullscreen presentation mode\n- 👆 Touch gesture support for mobile navigation",
 
     metadata: {}
   },
   {
     order: 3,
-    content: "## 📐 Technical Architecture\n\n**Frontend:**\n- React 18 + Vite for fast development\n- React Transition Group for animations\n- React Beautiful DnD for drag-and-drop\n- React Markdown + remark-gfm for content\n- AST-based rendering for safety\n- Storybook for component development\n- Vitest for unit testing\n\n**Backend:**\n- Node.js + Express REST API\n- Sequelize ORM for data management\n- SQLite for lightweight storage\n- Jest for API testing",
+    content: "## 📐 Technical Architecture\n\n**Frontend Stack:**\n- React 18 + Vite for fast development & HMR\n- React Transition Group for smooth animations \n- React Markdown + remark-gfm for content rendering\n- @uiw/react-md-editor for rich text editing\n- React Syntax Highlighter for code blocks\n- Custom AST-based rendering for enhanced security\n\n**Development Tools:**\n- Storybook for component development\n- Vitest for unit testing\n- Playwright for E2E testing\n- ESLint for code quality\n- CSS custom properties for theming",
 
     metadata: {}
   },
   {
     order: 4,
-    content: "## 💡 Technical Highlights\n **AST-based Markdown Rendering**\n   - Custom component mapping\n   - Enhanced security\n   - Better performance\n **Smooth Animations**\n   - Slide transitions\n   - Fullscreen mode\n   - Drag-and-drop effects\n **Responsive Design**\n   - Mobile-first approach\n   - Adaptive layouts\n   - Touch-friendly interactions",
+    content: "## 💡 Technical Highlights\n\n**Responsive Design System**\n- Mobile-first approach with adaptive layouts\n- Touch-friendly interactions and gestures\n- Landscape/portrait mode optimization\n- Fixed sidebar headers for better UX\n\n**Advanced State Management**\n- Optimistic updates for smooth interactions\n- Debounced auto-save (500ms delay)\n- Local state with proper data flow\n- Error handling with user feedback\n\n**Performance Optimizations**\n- React.memo for component memoization\n- Efficient re-rendering strategies\n- Lazy loading and code splitting\n- Smooth animations with CSS transforms",
 
     metadata: {}
   },
   {
     order: 5,
-    content: "## 🔧 Implementation Details\n\n```js\n// Example: Slide Transition Component\nConsole.log('hello word!')\n```\n\n✅ Clean component architecture with proper separation of concerns",
+    content: "## 🔧 Implementation Details\n\n```jsx\n// Example: Responsive Layout Logic\nfunction isMobileByUA() {\n  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);\n}\n\n// Auto-save with debouncing\nconst debouncedSave = async (slideId, updates) => {\n  if (saveTimeout) clearTimeout(saveTimeout);\n  const timeoutId = setTimeout(async () => {\n    await updateSlideApi(slideId, updates);\n  }, 500);\n  setSaveTimeout(timeoutId);\n};\n```\n\n✅ Clean component architecture with proper separation of concerns",
 
     metadata: {}
   },
   {
     order: 6,
-    content: "## 🎨 Slide Layouts\n\n| Layout Type | Description | Use Case |\n|-------------|-------------|----------|\n| Title | Large centered text | Opening slides |\n| Default | Standard content | General content |\n| Code | Syntax highlighting | Code examples |\n| Split | Two-column layout | Comparisons |\n| Image | Image with caption | Visual content |\n\n✅ Flexible layout system with metadata support",
+    content: "## 🎨 Slide Layouts & Features\n\n| Feature | Description | Implementation |\n|---------|-------------|---------------|\n| Title Layout | Large centered text | CSS Grid with flexbox |\n| Default Layout | Standard content flow | Responsive typography |\n| Code Layout | Syntax highlighting | React Syntax Highlighter |\n| Split Layout | Two-column design | CSS Grid layout |\n| Image Layout | Image with caption | Object-fit optimization |\n| Fullscreen Mode | Presentation view | Fixed positioning |\n| Mobile Navigation | Touch gestures | Touch event handlers |\n\n✅ Flexible layout system with metadata support",
 
     metadata: {}
   },
   {
     order: 7,
-    content: "## 🚧 Challenges & Solutions\n\n**Challenge 1: Drag-and-Drop Performance**\n- Solution: Optimized re-renders with React.memo\n- Used react-beautiful-dnd for smooth animations\n\n**Challenge 2: Markdown Parsing**\n- Solution: Custom AST renderer for better control\n- Implemented syntax highlighting with rehype-highlight\n\n**Challenge 3: State Management**\n- Solution: Local state with proper data flow\n- Optimistic updates for better UX",
+    content: "## 🚧 Challenges & Solutions\n\n**Challenge 1: Mobile Responsiveness**\n- Problem: Complex layout on small screens\n- Solution: Tab-based navigation for mobile, landscape mode optimization\n- Result: Seamless experience across all devices\n\n**Challenge 2: Real-time Auto-save**\n- Problem: Performance impact of frequent API calls\n- Solution: Debounced save with 500ms delay\n- Result: Smooth editing without lag\n\n**Challenge 3: Touch Gesture Navigation**\n- Problem: Swipe gestures conflicting with scrollable content\n- Solution: Smart gesture detection excluding code blocks and tables\n- Result: Intuitive mobile navigation\n\n**Challenge 4: Code Block Styling**\n- Problem: Inconsistent appearance across screen orientations\n- Solution: Unified CSS with responsive breakpoints\n- Result: Consistent code display everywhere",
 
     metadata: {}
   },
   {
     order: 8,
-    content: "## 📈 Future Improvements\n **Collaboration Features**\n   - Real-time editing with WebSocket\n   - User presence & cursors\n   - Comments & annotations\n **Export & Sharing**\n   - PDF/PPT export\n   - Shareable links\n   - Version control\n **Enhanced Editing**\n   - Slide templates\n   - Image upload & management\n   - AI-powered content suggestions\n\ **Performance**\n   - Slide lazy loading\n   - Image optimization\n   - Caching strategy",
+    content: "## 📈 Future Improvements\n\n**Enhanced Collaboration**\n- Real-time editing with WebSocket integration\n- User presence indicators & live cursors\n- Comments & annotations system\n- Version control & history tracking\n\n**Export & Sharing**\n- PDF/PPT export functionality\n- Shareable presentation links\n- QR code generation for mobile access\n- Cloud storage integration\n\n**Advanced Editing**\n- Slide templates library\n- Image upload & management\n- AI-powered content suggestions\n- Voice-to-text input\n\n**Performance & UX**\n- Virtual scrolling for large presentations\n- Image lazy loading & optimization\n- Progressive web app (PWA) features\n- Offline mode support",
 
     metadata: {}
   },
   {
     order: 9,
-    content: "## 🎓 Key Takeaways\n **Architecture Decisions**\n   - Choosing the right tools for the job\n   - Balancing complexity vs. features\n   - Planning for scalability\n\ **Development Process**\n   - Component-driven development\n   - Test-first approach\n   - Documentation importance\n\ **User Experience**\n   - Smooth animations matter\n   - Mobile responsiveness is crucial\n   - Keyboard shortcuts improve efficiency",
+    content: "## 🎓 Key Takeaways\n\n**Architecture Decisions**\n- Choosing the right tools for the job (Vite over CRA)\n- Balancing complexity vs. features\n- Planning for scalability from day one\n- Mobile-first responsive design approach\n\n**Development Process**\n- Component-driven development with Storybook\n- Test-first approach with Vitest & Playwright\n- Documentation importance for maintainability\n- Code quality with ESLint & proper linting\n\n**User Experience**\n- Smooth animations significantly improve perceived performance\n- Mobile responsiveness is crucial for modern apps\n- Keyboard shortcuts and touch gestures enhance efficiency\n- Consistent design across all screen sizes matters\n\n**Technical Excellence**\n- Debounced operations prevent performance issues\n- Proper error handling improves user trust\n- Optimistic updates create responsive feel\n- Accessibility considerations are essential",
 
     metadata: {}
   },
