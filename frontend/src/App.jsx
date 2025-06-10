@@ -8,6 +8,16 @@ import HotKeys from './components/HotKeys';
 import SlidePreview from './components/SlidePreview';
 import { fetchSlides, createSlide, updateSlide as updateSlideApi, deleteSlide as deleteSlideApi } from './services/api';
 import DraggableSlideList from './components/DraggableSlideList';
+import { 
+  AddIcon, 
+  RemoveIcon, 
+  FullscreenIcon, 
+  FullscreenExitIcon, 
+  UpIcon, 
+  DownIcon,
+  BackIcon,
+  CloseIcon
+} from './components/Icons';
 
 function isMobileByUA() {
   if (typeof navigator === 'undefined') return false;
@@ -157,14 +167,6 @@ export default function App() {
       console.error('Error adding new slide:', err);
       setError('Failed to add new slide');
     }
-  };
-
-  const updateSlideTitle = (id, newTitle) => {
-    setSlides(prev =>
-      prev.map(s =>
-        s.id === id ? { ...s, title: newTitle } : s
-      )
-    );
   };
 
   const handleNext = () => {
@@ -339,9 +341,10 @@ export default function App() {
                   width: 40, height: 40, border: 'none', background: 'rgba(0,0,0,0.1)', color: '#fff', borderRadius: '50%', fontSize: 24, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 8px rgba(0,0,0,0.15)', cursor: 'pointer'
                 }}
                 onClick={() => setIsFullscreen(false)}
-                aria-label="ESC"
+                aria-label="返回"
+                title="返回"
               >
-                &#8592;
+                <BackIcon style={{ width: 20, height: 20 }} />
               </button>
               <div className="slide-page-number" style={{ position: 'static', color: '#fff', fontSize: 18, background: 'rgba(0,0,0,0.1)', borderRadius: 20, padding: '4px 14px', minWidth: 60, textAlign: 'center', fontWeight: 500 }}>
                 {currentIndex + 1}/{slides.length}
@@ -381,12 +384,18 @@ export default function App() {
       {isMobile && isLandscapeMode && !isFullscreen && (
         <>
           <div className="sidebar active">
-            <div className="sidebar-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div className="sidebar-header">
               <h1 className="sidebar-title">Slides</h1>
-              <div className="slide-navigation" style={{ display: 'flex', gap: 4 }}>
-                <button className="btn" onClick={addNewSlide}>+</button>
-                <button className="btn" onClick={() => deleteSlide(currentSlideId)} disabled={!canDelete}>-</button>
-                <button className="btn" onClick={() => handleToggleFullscreen('button')}>{isFullscreen ? 'Exit' : 'Preview'}</button>
+              <div className="slide-navigation">
+                <button className="btn" onClick={addNewSlide} title="添加幻灯片">
+                  <AddIcon />
+                </button>
+                <button className="btn" onClick={() => deleteSlide(currentSlideId)} disabled={!canDelete} title="删除幻灯片">
+                  <RemoveIcon />
+                </button>
+                <button className="btn" onClick={() => handleToggleFullscreen('button')} title={isFullscreen ? '退出全屏' : '全屏预览'}>
+                  {isFullscreen ? <FullscreenExitIcon /> : <FullscreenIcon />}
+                </button>
               </div>
             </div>
             <DraggableSlideList
@@ -434,12 +443,18 @@ export default function App() {
       {isMobile && !isLandscapeMode && !isFullscreen && (
         <>
           <div className={`sidebar${mobileTab !== 'sidebar' ? '' : ' active'}`}> 
-            <div className="sidebar-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div className="sidebar-header">
               <h1 className="sidebar-title">Slides</h1>
-              <div className="slide-navigation" style={{ display: 'flex', gap: 4 }}>
-                <button className="btn" onClick={addNewSlide}>+</button>
-                <button className="btn" onClick={() => deleteSlide(currentSlideId)} disabled={!canDelete}>-</button>
-                <button className="btn" onClick={() => handleToggleFullscreen('button')}>{isFullscreen ? 'Exit' : 'Preview'}</button>
+              <div className="slide-navigation">
+                <button className="btn" onClick={addNewSlide} title="添加幻灯片">
+                  <AddIcon />
+                </button>
+                <button className="btn" onClick={() => deleteSlide(currentSlideId)} disabled={!canDelete} title="删除幻灯片">
+                  <RemoveIcon />
+                </button>
+                <button className="btn" onClick={() => handleToggleFullscreen('button')} title={isFullscreen ? '退出全屏' : '全屏预览'}>
+                  {isFullscreen ? <FullscreenExitIcon /> : <FullscreenIcon />}
+                </button>
               </div>
             </div>
             <DraggableSlideList
@@ -506,8 +521,10 @@ export default function App() {
               cursor: 'pointer',
               fontSize: '1.2em'
             }}
+            aria-label="关闭"
+            title="关闭"
           >
-            ×
+            <CloseIcon style={{ width: 20, height: 20 }} />
           </button>
         </div>
       )}
@@ -515,14 +532,24 @@ export default function App() {
       {!isMobile && !isFullscreen && (
         <>
           <div className="sidebar">
-            <div className="sidebar-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div className="sidebar-header">
               <h1 className="sidebar-title">Slides</h1>
-              <div className="slide-navigation" style={{ display: 'flex', gap: 4 }}>
-                <button className="btn" onClick={handlePrev}>↑</button>
-                <button className="btn" onClick={addNewSlide}>+</button>
-                <button className="btn" onClick={() => deleteSlide(currentSlideId)} disabled={!canDelete}>-</button>
-                <button className="btn" onClick={() => handleToggleFullscreen('button')}>{isFullscreen ? 'Exit' : 'Preview'}</button>
-                <button className="btn" onClick={handleNext}>↓</button>
+              <div className="slide-navigation">
+                <button className="btn" onClick={handlePrev} title="上一页">
+                  <UpIcon />
+                </button>
+                <button className="btn" onClick={addNewSlide} title="添加幻灯片">
+                  <AddIcon />
+                </button>
+                <button className="btn" onClick={() => deleteSlide(currentSlideId)} disabled={!canDelete} title="删除幻灯片">
+                  <RemoveIcon />
+                </button>
+                <button className="btn" onClick={() => handleToggleFullscreen('button')} title={isFullscreen ? '退出全屏' : '全屏预览'}>
+                  {isFullscreen ? <FullscreenExitIcon /> : <FullscreenIcon />}
+                </button>
+                <button className="btn" onClick={handleNext} title="下一页">
+                  <DownIcon />
+                </button>
               </div>
             </div>
             <DraggableSlideList
