@@ -40,7 +40,8 @@ const SlidePreview = ({
   metadata = {}, 
   currentIndex = 0, 
   totalSlides = 0,
-  isFullscreen = false 
+  isFullscreen = false,
+  isMobile = false
 }) => {
   const commonProps = {
     remarkPlugins: [remarkGfm],
@@ -197,7 +198,7 @@ const SlidePreview = ({
 
   return (
     <div className={`slide-preview-component ${isFullscreen ? 'fullscreen' : ''}`} style={{ backgroundColor: 'transparent' }}>
-      {isFullscreen && (
+      {isFullscreen && !isMobile && (
         <div className="slide-page-number">
           {currentIndex + 1}/{totalSlides}
         </div>

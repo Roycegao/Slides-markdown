@@ -20,16 +20,13 @@
   },
   "dependencies": {
     "@uiw/react-md-editor": "^4.0.7",
-    "katex": "^0.16.9",
     "react": "^18.2.0",
     "react-beautiful-dnd": "^13.1.1",
     "react-dom": "^18.2.0",
     "react-markdown": "^9.0.1",
-    "react-syntax-highlighter": "^15.5.0",
+    "react-syntax-highlighter": "^15.6.1",
     "react-transition-group": "^4.4.5",
-    "rehype-katex": "^7.0.0",
-    "remark-gfm": "^4.0.0",
-    "remark-math": "^6.0.0"
+    "remark-gfm": "^4.0.0"
   },
   "devDependencies": {
     "@eslint/js": "^8.56.0",

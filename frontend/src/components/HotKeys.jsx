@@ -3,11 +3,26 @@ import PropTypes from 'prop-types';
 
 function isEditableElement(target) {
   if (!target) return false;
-  const tag = target.tagName;
+  const tag = target.tagName && target.tagName.toUpperCase();
   if (!tag) return false;
   const editableTags = ['INPUT', 'TEXTAREA', 'SELECT'];
   if (editableTags.includes(tag)) return true;
   if (target.isContentEditable) return true;
+  // 检查是否在 markdown 编辑器输入区内
+  let el = target;
+  while (el) {
+    if (
+      el.classList &&
+      (
+        el.classList.contains('w-md-editor') ||
+        el.classList.contains('w-md-editor-text-input') ||
+        el.classList.contains('w-md-editor-content')
+      )
+    ) {
+      return true;
+    }
+    el = el.parentElement;
+  }
   return false;
 }
 
@@ -27,33 +42,31 @@ const HotKeys = ({
   }, [disabled]);
 
   const handleKeyDown = (event) => {
-    // 方向键翻页功能始终可用
-    switch (event.key) {
-      case 'ArrowLeft':
-        event.preventDefault();
-        onPrevSlide();
-        return;
-      case 'ArrowRight':
-        event.preventDefault();
-        onNextSlide();
-        return;
-      case 'ArrowUp':
-        event.preventDefault();
-        onPrevSlide();
-        return;
-      case 'ArrowDown':
-        event.preventDefault();
-        onNextSlide();
-        return;
-      case 'Escape':
-        event.preventDefault();
-        onToggleFullscreen();
-        return;
-    }
-
-    // 如果热键被禁用，不处理其他按键
-    if (allDisabled) {
-      return;
+    if (allDisabled) return;
+    // 只有在非输入框/非可编辑元素时才处理方向键
+    if (!isEditableElement(event.target)) {
+      switch (event.key) {
+        case 'ArrowLeft':
+          event.preventDefault();
+          onPrevSlide();
+          return;
+        case 'ArrowRight':
+          event.preventDefault();
+          onNextSlide();
+          return;
+        case 'ArrowUp':
+          event.preventDefault();
+          onPrevSlide();
+          return;
+        case 'ArrowDown':
+          event.preventDefault();
+          onNextSlide();
+          return;
+        case 'Escape':
+          event.preventDefault();
+          onToggleFullscreen();
+          return;
+      }
     }
 
     // 其他热键功能

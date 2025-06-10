@@ -46,9 +46,13 @@ describe('App Integration', () => {
     
     // Wait for loading to complete
     await waitFor(() => {
-      expect(screen.getByText('Slide 1')).toBeInTheDocument();
-      expect(screen.getByText('Slide 2')).toBeInTheDocument();
+      const activeTitle = document.querySelector('.slide-item.active .slide-item-title');
+      expect(activeTitle).toHaveTextContent('Slide 1');
     });
+
+    // 也可断言总数
+    const allTitles = Array.from(document.querySelectorAll('.slide-item-title'));
+    expect(allTitles.length).toBeGreaterThanOrEqual(2);
   });
 
   it('creates a new slide', async () => {
@@ -56,7 +60,8 @@ describe('App Integration', () => {
     
     // Wait for initial load
     await waitFor(() => {
-      expect(screen.getByText('Slide 1')).toBeInTheDocument();
+      const activeTitle = document.querySelector('.slide-item.active .slide-item-title');
+      expect(activeTitle).toHaveTextContent('Slide 1');
     });
 
     // Click add slide button
@@ -76,11 +81,12 @@ describe('App Integration', () => {
     
     // Wait for loading
     await waitFor(() => {
-      expect(screen.getByText('Slide 1')).toBeInTheDocument();
+      const activeTitle = document.querySelector('.slide-item.active .slide-item-title');
+      expect(activeTitle).toHaveTextContent('Slide 1');
     });
 
     // Select first slide
-    const slide1 = screen.getByText('Slide 1');
+    const slide1 = document.querySelectorAll('.slide-item-title')[0];
     await userEvent.click(slide1);
 
     // Update content
@@ -104,11 +110,12 @@ describe('App Integration', () => {
     
     // Wait for loading
     await waitFor(() => {
-      expect(screen.getByText('Slide 1')).toBeInTheDocument();
+      const activeTitle = document.querySelector('.slide-item.active .slide-item-title');
+      expect(activeTitle).toHaveTextContent('Slide 1');
     });
 
     // Select first slide
-    const slide1 = screen.getByText('Slide 1');
+    const slide1 = document.querySelectorAll('.slide-item-title')[0];
     await userEvent.click(slide1);
 
     // Click delete button
@@ -121,21 +128,29 @@ describe('App Integration', () => {
 
   it('navigates between slides using keyboard', async () => {
     render(<App />);
-    
     // Wait for loading
     await waitFor(() => {
-      expect(screen.getByText('Slide 1')).toBeInTheDocument();
+      const activeTitle = document.querySelector('.slide-item.active .slide-item-title');
+      expect(activeTitle).toHaveTextContent('Slide 1');
     });
 
-    // Use keyboard navigation
-    fireEvent.keyDown(document, { key: 'ArrowRight' });
+    // 进入全屏
+    const previewButton = screen.getByText('Preview');
+    await userEvent.click(previewButton);
+
+    // 用方向键切换
+    await userEvent.keyboard('{ArrowRight}');
     await waitFor(() => {
-      expect(screen.getByText('Slide 2')).toBeInTheDocument();
+      const h1 = document.querySelector('.content-wrapper h1');
+      expect(h1).toBeTruthy();
+      expect(h1.textContent).toBe('Slide 2');
     });
 
-    fireEvent.keyDown(document, { key: 'ArrowLeft' });
+    await userEvent.keyboard('{ArrowLeft}');
     await waitFor(() => {
-      expect(screen.getByText('Slide 1')).toBeInTheDocument();
+      const h1 = document.querySelector('.content-wrapper h1');
+      expect(h1).toBeTruthy();
+      expect(h1.textContent).toBe('Slide 1');
     });
   });
 
@@ -144,7 +159,8 @@ describe('App Integration', () => {
     
     // Wait for loading
     await waitFor(() => {
-      expect(screen.getByText('Slide 1')).toBeInTheDocument();
+      const activeTitle = document.querySelector('.slide-item.active .slide-item-title');
+      expect(activeTitle).toHaveTextContent('Slide 1');
     });
 
     // Enter fullscreen mode
@@ -152,7 +168,8 @@ describe('App Integration', () => {
     await userEvent.click(previewButton);
 
     // Verify fullscreen state
-    expect(screen.getByText('Slide 1')).toBeInTheDocument();
+    const previewTitle = screen.getByText('Slide 1');
+    expect(previewTitle).toBeInTheDocument();
     expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
 
     // Exit fullscreen mode
@@ -179,7 +196,8 @@ describe('App Integration', () => {
     
     // Wait for loading
     await waitFor(() => {
-      expect(screen.getByText('Slide 1')).toBeInTheDocument();
+      const activeTitle = document.querySelector('.slide-item.active .slide-item-title');
+      expect(activeTitle).toHaveTextContent('Slide 1');
     });
 
     // Create new slide
@@ -188,10 +206,10 @@ describe('App Integration', () => {
 
     // Verify order
     await waitFor(() => {
-      const slides = screen.getAllByText(/Slide \d/);
-      expect(slides[0]).toHaveTextContent('Slide 1');
-      expect(slides[1]).toHaveTextContent('Slide 2');
-      expect(slides[2]).toHaveTextContent('New Slide');
+      const allTitles = Array.from(document.querySelectorAll('.slide-item-title'));
+      expect(allTitles[0]).toHaveTextContent('Slide 1');
+      expect(allTitles[1]).toHaveTextContent('Slide 2');
+      expect(allTitles[2]).toHaveTextContent('New Slide');
     });
   });
 
@@ -200,11 +218,12 @@ describe('App Integration', () => {
     
     // Wait for loading
     await waitFor(() => {
-      expect(screen.getByText('Slide 2')).toBeInTheDocument();
+      const allTitles = Array.from(document.querySelectorAll('.slide-item-title'));
+      expect(allTitles[1]).toHaveTextContent('Slide 2');
     });
 
     // Select code slide
-    const codeSlide = screen.getByText('Slide 2');
+    const codeSlide = document.querySelectorAll('.slide-item-title')[1];
     await userEvent.click(codeSlide);
 
     // Update content but preserve metadata

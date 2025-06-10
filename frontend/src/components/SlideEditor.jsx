@@ -39,15 +39,17 @@ export default function SlideEditor({ slide, onSave }) {
       case 'code':
         return (
           <div className="metadata-group">
-            <label>Code Language:</label>
+            <label htmlFor="code-language">Code Language:</label>
             <input
+              id="code-language"
               type="text"
               value={metadata.language || ''}
               onChange={(e) => handleMetadataChange('language', e.target.value)}
               placeholder="e.g. javascript, python"
             />
-            <label>Explanation:</label>
+            <label htmlFor="code-explanation">Explanation:</label>
             <textarea
+              id="code-explanation"
               value={metadata.explanation || ''}
               onChange={(e) => handleMetadataChange('explanation', e.target.value)}
               placeholder="Add explanation for the code"
@@ -57,15 +59,17 @@ export default function SlideEditor({ slide, onSave }) {
       case 'split':
         return (
           <div className="metadata-group">
-            <label>Left Title:</label>
+            <label htmlFor="left-title">Left Title:</label>
             <input
+              id="left-title"
               type="text"
               value={metadata.leftTitle || ''}
               onChange={(e) => handleMetadataChange('leftTitle', e.target.value)}
               placeholder="Left section title"
             />
-            <label>Right Title:</label>
+            <label htmlFor="right-title">Right Title:</label>
             <input
+              id="right-title"
               type="text"
               value={metadata.rightTitle || ''}
               onChange={(e) => handleMetadataChange('rightTitle', e.target.value)}
@@ -76,15 +80,17 @@ export default function SlideEditor({ slide, onSave }) {
       case 'image':
         return (
           <div className="metadata-group">
-            <label>Image URL:</label>
+            <label htmlFor="image-url">Image URL:</label>
             <input
+              id="image-url"
               type="text"
               value={metadata.imageUrl || ''}
               onChange={(e) => handleMetadataChange('imageUrl', e.target.value)}
               placeholder="Enter image URL"
             />
-            <label>Caption:</label>
+            <label htmlFor="image-caption">Caption:</label>
             <input
+              id="image-caption"
               type="text"
               value={metadata.caption || ''}
               onChange={(e) => handleMetadataChange('caption', e.target.value)}
@@ -102,8 +108,9 @@ export default function SlideEditor({ slide, onSave }) {
       <h3>Edit Slide (Order: {slide.order})</h3>
       
       <div className="editor-section">
-        <label>Layout:</label>
+        <label htmlFor="slide-layout">Layout:</label>
         <select 
+          id="slide-layout"
           value={layout} 
           onChange={e => setLayout(e.target.value)}
           style={{ width: '100%', padding: '0.5rem', marginBottom: '1rem' }}
@@ -119,8 +126,9 @@ export default function SlideEditor({ slide, onSave }) {
       {renderLayoutMetadata()}
 
       <div className="editor-section">
-        <label>Content:</label>
+        <label htmlFor="slide-content">Content:</label>
         <textarea
+          id="slide-content"
           style={{ 
             width: '100%', 
             height: 300,

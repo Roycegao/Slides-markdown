@@ -1,37 +1,22 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import MDEditor, { commands } from "@uiw/react-md-editor";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
-import rehypeHighlight from "rehype-highlight";
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import "highlight.js/styles/github.css";
 import "./styles/global.css";
 import "./styles/editor.css";
-import { parseMarkdown } from "./utils/markdownParser";
-import MarkdownASTRenderer from "./components/MarkdownASTRenderer";
 import HotKeys from './components/HotKeys';
-import HotKeyHints from './components/HotKeyHints';
 import SlidePreview from './components/SlidePreview';
-import SlideEditor from './components/SlideEditor';
 import { fetchSlides, createSlide, updateSlide as updateSlideApi, deleteSlide as deleteSlideApi } from './services/api';
 import DraggableSlideList from './components/DraggableSlideList';
 
-const initialSlides = [
-  { 
-    id: 1, 
-    title: "Welcome", 
-    content: "# Welcome to Slides\n\nA modern presentation editor built with React.\n\n---\n\n## Features\n\n- ✨ Beautiful themes\n- 📝 Markdown support\n- 🎨 Clean and modern UI\n- ⚡ Fast and responsive",
+function isMobileByUA() {
+  if (typeof navigator === 'undefined') return false;
+  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+}
 
-    metadata: {}
-  },
-  { 
-    id: 2, 
-    title: "Getting Started", 
-    content: "## Getting Started\n\n1. Create new slides using the + button\n2. Edit content using Markdown\n3. Preview your slides in real-time\n\n---\n\n### Tips\n\n- Use `#` for headings\n- Use `-` for bullet points\n- Use ``` for code blocks",
-
-    metadata: {}
-  }
-];
+function isLandscape() {
+  return window.matchMedia && window.matchMedia('(orientation: landscape)').matches;
+}
 
 export default function App() {
   const [slides, setSlides] = useState([]);
@@ -41,6 +26,9 @@ export default function App() {
   const [error, setError] = useState(null);
   const [saveTimeout, setSaveTimeout] = useState(null);
   const [prevIndex, setPrevIndex] = useState(0);
+  const [mobileTab, setMobileTab] = useState('sidebar');
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768 || isMobileByUA());
+  const [isLandscapeMode, setIsLandscapeMode] = useState(isLandscape());
 
   // Load slides
   useEffect(() => {
@@ -53,7 +41,7 @@ export default function App() {
           setCurrentSlideId(data[0].id);
         }
       } catch (err) {
-        setError('Failed to load slides');
+        setError('Error loading slides');
         console.error('Error loading slides:', err);
       } finally {
         setIsLoading(false);
@@ -65,26 +53,17 @@ export default function App() {
   // Auto-save functionality
   const debouncedSave = async (slideId, updates) => {
     try {
-      // Clear previous timer
       if (saveTimeout) {
         clearTimeout(saveTimeout);
       }
-
-      // Set new timer, save after 500ms
       const timeoutId = setTimeout(async () => {
         try {
-          const updatedSlide = await updateSlideApi(slideId, updates);
-          setSlides(prev =>
-            prev.map(s =>
-              s.id === slideId ? updatedSlide : s
-            )
-          );
+          await updateSlideApi(slideId, updates);
         } catch (err) {
           setError('Failed to save slide');
           console.error('Error saving slide:', err);
         }
       }, 500);
-
       setSaveTimeout(timeoutId);
     } catch (err) {
       console.error('Error in debounced save:', err);
@@ -104,24 +83,16 @@ export default function App() {
 
   const updateContent = (value) => {
     if (!currentSlide) return;
-
     // Ensure value is a string
     const contentValue = typeof value === 'string' ? value : '';
-
-    const updates = {
-      ...currentSlide,
-      content: contentValue
-    };
-
-    // Update local state
+    // 只本地 setSlides，不要用新对象替换整个 slide
     setSlides(prev =>
       prev.map(s =>
-        s.id === currentSlideId ? updates : s
+        s.id === currentSlideId ? { ...s, content: contentValue } : s
       )
     );
-
-    // Trigger auto-save
-    debouncedSave(currentSlideId, updates);
+    // 只做后端同步
+    debouncedSave(currentSlideId, { ...currentSlide, content: contentValue });
   };
 
   const updateSlideMetadata = (updates) => {
@@ -175,7 +146,7 @@ export default function App() {
       const newSlide = {
         title: `New Slide`,
         content: `# New Slide\n\nStart writing your content here...`,
-  
+        layout: 'default',
         metadata: {},
         order: slides.length
       };
@@ -268,6 +239,50 @@ export default function App() {
     }
   };
 
+  // 监听窗口宽度变化，进入移动端时自动切tab到sidebar
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768 || isMobileByUA());
+      setIsLandscapeMode(isLandscape());
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // 滑动手势处理（仅移动端全屏预览）
+  const touchStartX = useRef(null);
+  const touchEndX = useRef(null);
+  const handleTouchStart = (e) => {
+    if (!isMobile || !isFullscreen) return;
+    touchStartX.current = e.touches[0].clientX;
+  };
+  const handleTouchEnd = (e) => {
+    if (!isMobile || !isFullscreen) return;
+    // 判断是否在可横向滚动的内容（代码块、表格等）内
+    let el = e.target;
+    let blockScroll = false;
+    while (el) {
+      if (
+        el.tagName === 'PRE' ||
+        el.tagName === 'CODE' ||
+        el.tagName === 'TABLE' ||
+        el.tagName === 'TH' ||
+        el.tagName === 'TD'
+      ) {
+        blockScroll = true;
+        break;
+      }
+      el = el.parentElement;
+    }
+    if (blockScroll) return;
+    touchEndX.current = e.changedTouches[0].clientX;
+    const deltaX = touchEndX.current - touchStartX.current;
+    if (Math.abs(deltaX) > 30) {
+      if (deltaX < 0 && canNext) handleNext(); // 左滑，下一页
+      if (deltaX > 0 && canPrev) handlePrev(); // 右滑，上一页
+    }
+  };
+
   if (isLoading) {
     return <div className="loading">Loading slides...</div>;
   }
@@ -282,6 +297,13 @@ export default function App() {
 
   return (
     <div className={`app-container ${isFullscreen ? 'fullscreen' : ''}`}>
+      {/* 竖屏时显示顶部tab，横屏时隐藏 */}
+      {isMobile && !isLandscapeMode && !isFullscreen && (
+        <div style={{ display: 'flex', width: '100vw', borderBottom: '1px solid #eee', background: 'var(--bg-secondary)', zIndex: 10 }}>
+          <button className={`btn${mobileTab === 'sidebar' ? ' btn-primary' : ''}`} style={{ flex: 1 }} onClick={() => setMobileTab('sidebar')}>目录</button>
+          <button className={`btn${mobileTab === 'editor' ? ' btn-primary' : ''}`} style={{ flex: 1 }} onClick={() => setMobileTab('editor')}>编辑</button>
+        </div>
+      )}
       <HotKeys
         onSave={handleSave}
         onAddSlide={addNewSlide}
@@ -291,14 +313,30 @@ export default function App() {
         onPrevSlide={handlePrev}
         disabled={!isFullscreen}
       />
-
       <CSSTransition
         in={isFullscreen}
         timeout={300}
         classNames="fullscreen"
         unmountOnExit
       >
-        <div className="fullscreen-preview-container">
+        <div className="fullscreen-preview-container" onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
+          {/* 移动端全屏左上角返回，右上角页码 */}
+          {isMobile && (
+            <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', zIndex: 1001, display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px' }}>
+              <button
+                style={{
+                  width: 40, height: 40, border: 'none', background: 'rgba(0,0,0,0.1)', color: '#fff', borderRadius: '50%', fontSize: 24, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 8px rgba(0,0,0,0.15)', cursor: 'pointer'
+                }}
+                onClick={() => setIsFullscreen(false)}
+                aria-label="ESC"
+              >
+                &#8592;
+              </button>
+              <div className="slide-page-number" style={{ position: 'static', color: '#fff', fontSize: 18, background: 'rgba(0,0,0,0.1)', borderRadius: 20, padding: '4px 14px', minWidth: 60, textAlign: 'center', fontWeight: 500 }}>
+                {currentIndex + 1}/{slides.length}
+              </div>
+            </div>
+          )}
           {isFullscreen && (
             <div className="slide-progress-bar">
               <div 
@@ -322,107 +360,118 @@ export default function App() {
                 isFullscreen={true}
                 currentIndex={currentIndex}
                 totalSlides={slides.length}
+                isMobile={isMobile}
               />
             </CSSTransition>
           </TransitionGroup>
         </div>
       </CSSTransition>
-
-      {!isFullscreen && (
-        <div className="sidebar">
-          <div className="sidebar-header">
-            <h1 className="sidebar-title">Slides</h1>
-          </div>
-          <DraggableSlideList
-            slides={slides}
-            currentSlideId={currentSlideId}
-            onSelect={handleSlideSelect}
-            onReorder={handleReorder}
-          />
-        </div>
-      )}
-
-      {!isFullscreen && (
-        <div className="preview-container">
-          <div className="preview-toolbar">
-            <div className="slide-navigation">
-              <button className="btn" onClick={handlePrev} disabled={!canPrev}>
-                ←
-              </button>
-              <div className="slide-actions">
-                <button className="btn" onClick={addNewSlide}>
-                  +
-                </button>
-                <button className="btn" onClick={() => deleteSlide(currentSlideId)} disabled={!canDelete}>
-                  -
-                </button>
-                <button className="btn" onClick={() => handleToggleFullscreen('button')}>
-                  {isFullscreen ? 'Exit' : 'Preview'}
-                </button>
+      {/* 横屏时，移动端只显示左侧 sidebar（目录+按钮+DraggableSlideList）和右侧 markdown 编辑器，不渲染预览部分 */}
+      {isMobile && isLandscapeMode && !isFullscreen && (
+        <>
+          <div className="sidebar active">
+            <div className="sidebar-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <h1 className="sidebar-title">Slides</h1>
+              <div className="slide-navigation" style={{ display: 'flex', gap: 4 }}>
+                <button className="btn" onClick={addNewSlide}>+</button>
+                <button className="btn" onClick={() => deleteSlide(currentSlideId)} disabled={!canDelete}>-</button>
+                <button className="btn" onClick={() => handleToggleFullscreen('button')}>{isFullscreen ? 'Exit' : 'Preview'}</button>
               </div>
-              <button className="btn" onClick={handleNext} disabled={!canNext}>
-                →
-              </button>
             </div>
-          </div>
-          <div className="preview-content">
-            <TransitionGroup component={null}>
-              <CSSTransition
-                key={currentSlideId}
-                timeout={500}
-                classNames={currentIndex > prevIndex ? 'slide' : 'slide-prev'}
-                unmountOnExit
-              >
-                <SlidePreview
-                  content={typeof currentSlide?.content === 'string' ? currentSlide.content : ''}
-                  metadata={currentSlide?.metadata || {}}
-                  isFullscreen={true}
-                  currentIndex={slides.findIndex(s => s.id === currentSlideId)}
-                  totalSlides={slides.length}
-                />
-              </CSSTransition>
-            </TransitionGroup>
-          </div>
-        </div>
-      )}
-
-      {!isFullscreen && (
-        <div className="editor-container">
-          <div className="editor-content">
-            <MDEditor
-              value={currentSlide?.content || ''}
-              onChange={updateContent}
-              height="100%"
-              preview="edit"
-              hideToolbar={false}
-              enableScroll={true}
-              className="custom-editor"
-              commands={[
-                commands.bold,
-                commands.italic,
-                commands.strikethrough,
-                commands.divider,
-                commands.link,
-                commands.image,
-                commands.divider,
-                commands.code,
-                commands.codeBlock,
-                commands.divider,
-                commands.unorderedListCommand,
-                commands.orderedListCommand,
-                commands.checkedListCommand,
-                commands.divider,
-                commands.quote,
-                commands.hr,
-                commands.divider,
-                // commands.help,
-              ]}
-              extraCommands={[]}
+            <DraggableSlideList
+              slides={slides}
+              currentSlideId={currentSlideId}
+              onSelect={handleSlideSelect}
+              onReorder={handleReorder}
             />
           </div>
-        </div>
+          <div className="editor-container active">
+            <div className="editor-content">
+              <MDEditor
+                value={currentSlide?.content || ''}
+                onChange={updateContent}
+                height="100%"
+                preview="edit"
+                hideToolbar={false}
+                enableScroll={true}
+                className="custom-editor"
+                commands={[
+                  commands.title,  
+                  commands.hr,
+                  commands.bold,
+                  commands.italic,
+                  commands.strikethrough,
+                  commands.divider,
+                  commands.link,
+                  commands.image,
+                  commands.code,
+                  commands.codeBlock,
+                  commands.unorderedListCommand,
+                  commands.orderedListCommand,
+                  commands.checkedListCommand,
+                  commands.quote,
+                  commands.divider,
+                  commands.table,
+                ]}
+                extraCommands={[]}
+              />
+            </div>
+          </div>
+        </>
       )}
-
+      {/* 竖屏时，移动端tab切换内容 */}
+      {isMobile && !isLandscapeMode && !isFullscreen && (
+        <>
+          <div className={`sidebar${mobileTab !== 'sidebar' ? '' : ' active'}`}> 
+            <div className="sidebar-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <h1 className="sidebar-title">Slides</h1>
+              <div className="slide-navigation" style={{ display: 'flex', gap: 4 }}>
+                <button className="btn" onClick={addNewSlide}>+</button>
+                <button className="btn" onClick={() => deleteSlide(currentSlideId)} disabled={!canDelete}>-</button>
+                <button className="btn" onClick={() => handleToggleFullscreen('button')}>{isFullscreen ? 'Exit' : 'Preview'}</button>
+              </div>
+            </div>
+            <DraggableSlideList
+              slides={slides}
+              currentSlideId={currentSlideId}
+              onSelect={handleSlideSelect}
+              onReorder={handleReorder}
+            />
+          </div>
+          <div className={`editor-container${mobileTab !== 'editor' ? '' : ' active'}`}> 
+            <div className="editor-content">
+              <MDEditor
+                value={currentSlide?.content || ''}
+                onChange={updateContent}
+                height="100%"
+                preview="edit"
+                hideToolbar={false}
+                enableScroll={true}
+                className="custom-editor"
+                commands={[
+                  commands.title,  
+                  commands.hr,
+                  commands.bold,
+                  commands.italic,
+                  commands.strikethrough,
+                  commands.divider,
+                  commands.link,
+                  commands.image,
+                  commands.code,
+                  commands.codeBlock,
+                  commands.unorderedListCommand,
+                  commands.orderedListCommand,
+                  commands.checkedListCommand,
+                  commands.quote,
+                  commands.divider,
+                  commands.table,
+                ]}
+                extraCommands={[]}
+              />
+            </div>
+          </div>
+        </>
+      )}
       {error && (
         <div className="error-message" style={{
           position: 'fixed',

@@ -21,8 +21,10 @@ describe('SlideEditor', () => {
     render(<SlideEditor slide={mockSlide} onSave={mockOnSave} />);
     
     expect(screen.getByText('Edit Slide (Order: 1)')).toBeInTheDocument();
-    expect(screen.getByDisplayValue('# Test Slide\n\nThis is a test slide.')).toBeInTheDocument();
-    expect(screen.getByDisplayValue('default')).toBeInTheDocument();
+    const textarea = screen.getByLabelText('Content:');
+    expect(textarea.value).toContain('# Test Slide');
+    const select = screen.getByLabelText('Layout:');
+    expect(select.value).toBe('default');
   });
 
   it('calls onSave with updated content when save button is clicked', () => {

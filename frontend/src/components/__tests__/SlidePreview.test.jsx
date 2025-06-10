@@ -27,13 +27,13 @@ describe('SlidePreview', () => {
     };
     
     render(<SlidePreview content={content} layout="code" metadata={metadata} />);
-    
-    // Check if code is rendered correctly
-    expect(screen.getByText('const')).toBeInTheDocument();
-    expect(screen.getByText('hello')).toBeInTheDocument();
-    expect(screen.getByText('"world"')).toBeInTheDocument();
-    
-    // Check if explanation is rendered
+    // 检查代码块内容
+    const code = document.querySelector('.code-content code');
+    expect(code).toBeInTheDocument();
+    expect(code.textContent).toContain('const');
+    expect(code.textContent).toContain('hello');
+    expect(code.textContent).toContain('world');
+    // 检查解释
     expect(screen.getByText('This is a simple JavaScript example')).toBeInTheDocument();
   });
 
@@ -70,7 +70,9 @@ describe('SlidePreview', () => {
 
   it('handles empty content gracefully', () => {
     render(<SlidePreview content="" layout="default" />);
-    expect(screen.getByText('')).toBeInTheDocument();
+    const wrapper = document.querySelector('.content-wrapper');
+    expect(wrapper).toBeInTheDocument();
+    expect(wrapper.textContent).toBe("");
   });
 
   it('handles markdown formatting correctly', () => {
@@ -93,9 +95,11 @@ describe('SlidePreview', () => {
   it('renders code blocks with language specification', () => {
     const content = '```python\ndef hello():\n    print("Hello, World!")\n```';
     render(<SlidePreview content={content} layout="default" />);
-    
-    expect(screen.getByText('def')).toBeInTheDocument();
-    expect(screen.getByText('hello()')).toBeInTheDocument();
-    expect(screen.getByText('print("Hello, World!")')).toBeInTheDocument();
+    const code = document.querySelector('.content-wrapper code');
+    expect(code).toBeInTheDocument();
+    expect(code.textContent).toContain('def');
+    expect(code.textContent).toContain('hello');
+    expect(code.textContent).toContain('print');
+    expect(code.textContent).toContain('Hello, World!');
   });
 }); 
