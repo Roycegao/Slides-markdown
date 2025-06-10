@@ -472,7 +472,7 @@ body {
 
 .editor-content {
   flex: 1;
-  display: flex;
+  /* display: flex; */
   overflow: hidden;
 }
 
