@@ -1,4 +1,4 @@
-const API_BASE_URL = 'https://slides-markdown-server.vercel.app';
+const API_BASE_URL = 'http://localhost:4000';
 
 export async function fetchSlides() {
   const response = await fetch(`${API_BASE_URL}/slides`);

@@ -125,7 +125,7 @@ const defaultSlides = [
   },
   {
     order: 5,
-    content: "## 🔧 Implementation Details\n\n```jsx\n console.log('hello world!')```\n\n✅ Clean component architecture with proper separation of concerns",
+    content: "## 🔧 Implementation Details\n\n```jsx\nconsole.log('hello world!')\n```\n\n✅ Clean component architecture with proper separation of concerns",
 
     metadata: {}
   },
