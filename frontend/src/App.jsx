@@ -507,9 +507,11 @@ export default function App() {
             <div className="sidebar-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <h1 className="sidebar-title">Slides</h1>
               <div className="slide-navigation" style={{ display: 'flex', gap: 4 }}>
+                <button className="btn" onClick={handlePrev}>↑</button>
                 <button className="btn" onClick={addNewSlide}>+</button>
                 <button className="btn" onClick={() => deleteSlide(currentSlideId)} disabled={!canDelete}>-</button>
                 <button className="btn" onClick={() => handleToggleFullscreen('button')}>{isFullscreen ? 'Exit' : 'Preview'}</button>
+                <button className="btn" onClick={handleNext}>↓</button>
               </div>
             </div>
             <DraggableSlideList

@@ -65,17 +65,20 @@ body {
 }
 
 .sidebar-header {
-  padding: 30px;
+  padding: 16px;
   border-bottom: 1px solid var(--border-color);
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .sidebar-title {
   font-size: 1.2rem;
   font-weight: 600;
   color: var(--text-primary);
+  margin: 0;
 }
 
 .slides-list {
@@ -354,13 +357,9 @@ body {
 .slide-navigation {
   display: flex;
   align-items: center;
-  gap: 16px;
-  background: linear-gradient(to bottom, #f3f1f1, #f3f1f1);
-  padding: 12px 24px;
-  border-radius: 18px;
-  box-shadow: 0 2px 8px rgba(172, 170, 170, 0.2),
-              inset 0 1px 1px rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(207, 201, 201, 0.05);
+  gap: 8px;
+  width: 100%;
+  justify-content: flex-end;
 }
 
 .slide-actions {
@@ -735,7 +734,14 @@ body {
     flex-direction: column;
   }
   .sidebar-header {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
     padding: 12px;
+  }
+  .sidebar-title {
+    font-size: 1.1rem;
+    margin: 0;
   }
   .slide-item {
     padding: 8px 4px;
@@ -749,6 +755,16 @@ body {
   .btn {
     font-size: 0.95rem;
     padding: 6px 10px;
+  }
+  .slide-navigation {
+    width: auto;
+    gap: 4px;
+  }
+  .slide-navigation .btn {
+    padding: 4px 8px;
+    min-width: 32px;
+    height: 32px;
+    font-size: 1rem;
   }
 }
 
