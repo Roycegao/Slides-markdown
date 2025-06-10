@@ -125,7 +125,7 @@ const defaultSlides = [
   },
   {
     order: 5,
-    content: "## 🔧 Implementation Details\n\n```jsx\n// Example: Responsive Layout Logic\nfunction isMobileByUA() {\n  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);\n}\n\n// Auto-save with debouncing\nconst debouncedSave = async (slideId, updates) => {\n  if (saveTimeout) clearTimeout(saveTimeout);\n  const timeoutId = setTimeout(async () => {\n    await updateSlideApi(slideId, updates);\n  }, 500);\n  setSaveTimeout(timeoutId);\n};\n```\n\n✅ Clean component architecture with proper separation of concerns",
+    content: "## 🔧 Implementation Details\n\n```jsx\n console.log('hello world!')```\n\n✅ Clean component architecture with proper separation of concerns",
 
     metadata: {}
   },
