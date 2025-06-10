@@ -500,6 +500,71 @@ export default function App() {
           </button>
         </div>
       )}
+      {/* PC端默认布局 */}
+      {!isMobile && !isFullscreen && (
+        <>
+          <div className="sidebar">
+            <div className="sidebar-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <h1 className="sidebar-title">Slides</h1>
+              <div className="slide-navigation" style={{ display: 'flex', gap: 4 }}>
+                <button className="btn" onClick={addNewSlide}>+</button>
+                <button className="btn" onClick={() => deleteSlide(currentSlideId)} disabled={!canDelete}>-</button>
+                <button className="btn" onClick={() => handleToggleFullscreen('button')}>{isFullscreen ? 'Exit' : 'Preview'}</button>
+              </div>
+            </div>
+            <DraggableSlideList
+              slides={slides}
+              currentSlideId={currentSlideId}
+              onSelect={handleSlideSelect}
+              onReorder={handleReorder}
+            />
+          </div>
+          <div className="preview-container">
+            <div className="preview-content">
+              <SlidePreview
+                content={typeof currentSlide?.content === 'string' ? currentSlide.content : ''}
+                metadata={currentSlide?.metadata || {}}
+                isFullscreen={false}
+                currentIndex={currentIndex}
+                totalSlides={slides.length}
+                isMobile={isMobile}
+              />
+            </div>
+          </div>
+          <div className="editor-container">
+            <div className="editor-content">
+              <MDEditor
+                value={currentSlide?.content || ''}
+                onChange={updateContent}
+                height="100%"
+                preview="edit"
+                hideToolbar={false}
+                enableScroll={true}
+                className="custom-editor"
+                commands={[
+                  commands.title,  
+                  commands.hr,
+                  commands.bold,
+                  commands.italic,
+                  commands.strikethrough,
+                  commands.divider,
+                  commands.link,
+                  commands.image,
+                  commands.code,
+                  commands.codeBlock,
+                  commands.unorderedListCommand,
+                  commands.orderedListCommand,
+                  commands.checkedListCommand,
+                  commands.quote,
+                  commands.divider,
+                  commands.table,
+                ]}
+                extraCommands={[]}
+              />
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 }
