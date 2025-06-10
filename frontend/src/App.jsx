@@ -430,7 +430,6 @@ export default function App() {
                   commands.orderedListCommand,
                   commands.checkedListCommand,
                   commands.quote,
-                  commands.divider,
                   commands.table,
                 ]}
                 extraCommands={[]}
@@ -596,7 +595,6 @@ export default function App() {
                   commands.orderedListCommand,
                   commands.checkedListCommand,
                   commands.quote,
-                  commands.divider,
                   commands.table,
                 ]}
                 extraCommands={[]}
