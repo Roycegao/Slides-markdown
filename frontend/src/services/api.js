@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://localhost:4000';
+const API_BASE_URL = 'https://slides-markdown-server.vercel.app';
 
 // Mock data for development/testing
 const mockSlides = [

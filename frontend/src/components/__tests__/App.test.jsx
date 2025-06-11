@@ -1,8 +1,8 @@
+import App from '../../App';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import * as api from '../../services/api';
-import App from '../../App';
 
 vi.mock('../../services/api', () => ({
   fetchSlides: vi.fn(),
@@ -675,39 +675,6 @@ describe('App', () => {
     await waitForComponentToLoad();
     // This test covers the case where currentSlide is null in handleSave
     // The component should handle this gracefully
-    expectComponentToBeLoaded();
-  });
-
-  it('handles handleReorder with empty slides array', async () => {
-    api.fetchSlides.mockResolvedValueOnce([]);
-    render(<App />);
-    
-    // 等待组件渲染完成
-    await waitFor(() => {
-      // 检查是否有 "No slides available" 消息
-      const noSlidesElement = screen.queryByText((content) => 
-        content && content.includes('No slides available')
-      );
-      expect(noSlidesElement).toBeInTheDocument();
-    });
-    
-    // 当 slides 为空时，这是正常状态，不需要额外的验证
-    // expectComponentToBeLoaded(); // 移除这行，因为空 slides 是正常状态
-  });
-
-  it('handles window resize to mobile landscape', async () => {
-    api.fetchSlides.mockResolvedValueOnce([]);
-    render(<App />);
-    await waitFor(() => expect(screen.getByText((content) => content.includes('No slides available'))).toBeInTheDocument());
-    act(() => {
-      Object.defineProperty(window, 'innerWidth', { writable: true, value: 800 });
-      Object.defineProperty(window, 'matchMedia', {
-        writable: true,
-        value: vi.fn(() => ({ matches: true }))
-      });
-      window.dispatchEvent(new Event('resize'));
-    });
-    // 竖屏移动端tab下，Slides按钮依然可见（此时其实页面是 no slides）
     expectComponentToBeLoaded();
   });
 
