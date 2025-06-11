@@ -71,8 +71,9 @@ npm run build
 # Run tests
 npm test
 
-# Run E2E tests
-npm run test:e2e
+
+# test coverage
+npm run test:coverage
 
 # Start Storybook
 npm run storybook

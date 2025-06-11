@@ -1,5 +1,4 @@
-import unifiedDefault, { unified as unifiedNamed } from 'unified';
-const unified = unifiedDefault || unifiedNamed;
+import { unified } from 'unified';
 import remarkParse from 'remark-parse';
 import remarkGfm from 'remark-gfm';
 import { visit } from 'unist-util-visit';
