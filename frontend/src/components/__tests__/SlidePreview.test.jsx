@@ -102,4 +102,66 @@ describe('SlidePreview', () => {
     expect(code.textContent).toContain('print');
     expect(code.textContent).toContain('Hello, World!');
   });
+
+  it('renders default layout', () => {
+    const { getByText } = render(<SlidePreview content={'default'} layout="default" />);
+    expect(getByText('default')).toBeInTheDocument();
+  });
+
+  it('renders title layout', () => {
+    const { getByText } = render(<SlidePreview content={'title'} layout="title" />);
+    expect(getByText('title')).toBeInTheDocument();
+  });
+
+  it('renders code layout with explanation', () => {
+    const { getByText } = render(<SlidePreview content={'console.log(1)'} layout="code" metadata={{ explanation: 'explain', language: 'js' }} />);
+    expect(getByText('explain')).toBeInTheDocument();
+    expect(getByText('js Code Explanation')).toBeInTheDocument();
+  });
+
+  it('renders code layout without explanation', () => {
+    const { getByText } = render(<SlidePreview content={'console.log(1)'} layout="code" metadata={{}} />);
+    expect(getByText('console.log(1)')).toBeInTheDocument();
+  });
+
+  it('renders split layout', () => {
+    const { getByText } = render(<SlidePreview content={'left---right'} layout="split" metadata={{ leftTitle: 'L', rightTitle: 'R' }} />);
+    expect(getByText('L')).toBeInTheDocument();
+    expect(getByText('R')).toBeInTheDocument();
+    expect(getByText('left')).toBeInTheDocument();
+    expect(getByText('right')).toBeInTheDocument();
+  });
+
+  it('renders image layout', () => {
+    const { getByAltText, getByText } = render(<SlidePreview content={'img content'} layout="image" metadata={{ imageUrl: 'img.png', caption: 'caption' }} />);
+    expect(getByAltText('caption')).toBeInTheDocument();
+    expect(getByText('caption')).toBeInTheDocument();
+    expect(getByText('img content')).toBeInTheDocument();
+  });
+
+  it('renders image layout without imageUrl', () => {
+    const { getByText } = render(<SlidePreview content={'img content'} layout="image" metadata={{ caption: 'caption' }} />);
+    expect(getByText('caption')).toBeInTheDocument();
+    expect(getByText('img content')).toBeInTheDocument();
+  });
+
+  it('renders image layout without caption', () => {
+    const { getByText } = render(<SlidePreview content={'img content'} layout="image" metadata={{ imageUrl: 'img.png' }} />);
+    expect(getByText('img content')).toBeInTheDocument();
+  });
+
+  it('renders fullscreen and mobile', () => {
+    const { container } = render(<SlidePreview content={'full'} isFullscreen isMobile />);
+    expect(container.textContent).toContain('full');
+  });
+
+  it('handles unknown layout', () => {
+    const { getByText } = render(<SlidePreview content={'unknown'} layout="unknown" />);
+    expect(getByText('unknown')).toBeInTheDocument();
+  });
+
+  it('renders with metadata null', () => {
+    const { getByText } = render(<SlidePreview content={'meta'} layout="default" metadata={null} />);
+    expect(getByText('meta')).toBeInTheDocument();
+  });
 }); 

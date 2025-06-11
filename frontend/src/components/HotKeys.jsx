@@ -27,8 +27,6 @@ function isEditableElement(target) {
 }
 
 const HotKeys = ({
-  onSave,
-  onAddSlide,
   onDeleteSlide,
   onToggleFullscreen,
   onNextSlide,
@@ -72,14 +70,6 @@ const HotKeys = ({
     // 其他热键功能
     if (event.ctrlKey || event.metaKey) {
       switch (event.key.toLowerCase()) {
-        case 's':
-          event.preventDefault();
-          onSave();
-          break;
-        case 'n':
-          event.preventDefault();
-          onAddSlide();
-          break;
         case 'd':
           event.preventDefault();
           onDeleteSlide();
@@ -99,14 +89,13 @@ const HotKeys = ({
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [allDisabled, onSave, onAddSlide, onDeleteSlide, onToggleFullscreen, onNextSlide, onPrevSlide]);
+  }, [allDisabled, onDeleteSlide, onToggleFullscreen, onNextSlide, onPrevSlide]);
 
   return null;
 };
 
 HotKeys.propTypes = {
-  onSave: PropTypes.func.isRequired,
-  onAddSlide: PropTypes.func.isRequired,
+  
   onDeleteSlide: PropTypes.func.isRequired,
   onToggleFullscreen: PropTypes.func.isRequired,
   onNextSlide: PropTypes.func.isRequired,

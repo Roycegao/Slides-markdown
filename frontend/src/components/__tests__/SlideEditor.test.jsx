@@ -163,4 +163,39 @@ describe('SlideEditor', () => {
       metadata: {}
     });
   });
+
+  it('renders and edits default', () => {
+    const onSave = vi.fn();
+    const { getByText, getByLabelText } = render(<SlideEditor slide={mockSlide} onSave={onSave} />);
+    expect(getByText(/Edit Slide/)).toBeInTheDocument();
+    fireEvent.change(getByLabelText('Layout:'), { target: { value: 'title' } });
+    expect(getByLabelText('Layout:').value).toBe('title');
+  });
+
+  it('renders and edits title', () => {
+    const slide = { ...mockSlide, layout: 'title' };
+    const { getByLabelText } = render(<SlideEditor slide={slide} onSave={vi.fn()} />);
+    expect(getByLabelText('Layout:')).toBeInTheDocument();
+  });
+
+  it('renders and edits code', () => {
+    const slide = { ...mockSlide, layout: 'code', metadata: { language: 'js', explanation: 'exp' } };
+    const { getByLabelText } = render(<SlideEditor slide={slide} onSave={vi.fn()} />);
+    expect(getByLabelText('Code Language:')).toBeInTheDocument();
+    expect(getByLabelText('Explanation:')).toBeInTheDocument();
+  });
+
+  it('renders and edits split', () => {
+    const slide = { ...mockSlide, layout: 'split', metadata: { leftTitle: 'L', rightTitle: 'R' } };
+    const { getByLabelText } = render(<SlideEditor slide={slide} onSave={vi.fn()} />);
+    expect(getByLabelText('Left Title:')).toBeInTheDocument();
+    expect(getByLabelText('Right Title:')).toBeInTheDocument();
+  });
+
+  it('renders and edits image', () => {
+    const slide = { ...mockSlide, layout: 'image', metadata: { imageUrl: 'img', caption: 'cap' } };
+    const { getByLabelText } = render(<SlideEditor slide={slide} onSave={vi.fn()} />);
+    expect(getByLabelText('Image URL:')).toBeInTheDocument();
+    expect(getByLabelText('Caption:')).toBeInTheDocument();
+  });
 }); 

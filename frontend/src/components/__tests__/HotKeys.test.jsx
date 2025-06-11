@@ -4,8 +4,6 @@ import HotKeys from '../HotKeys';
 
 describe('HotKeys', () => {
   const mockHandlers = {
-    onSave: vi.fn(),
-    onAddSlide: vi.fn(),
     onDeleteSlide: vi.fn(),
     onToggleFullscreen: vi.fn(),
     onNextSlide: vi.fn(),
@@ -46,18 +44,6 @@ describe('HotKeys', () => {
     expect(mockHandlers.onToggleFullscreen).toHaveBeenCalledTimes(1);
   });
 
-  it('calls onSave when Ctrl+S is pressed', () => {
-    render(<HotKeys {...mockHandlers} />);
-    fireEvent.keyDown(document, { key: 's', ctrlKey: true });
-    expect(mockHandlers.onSave).toHaveBeenCalledTimes(1);
-  });
-
-  it('calls onAddSlide when Ctrl+N is pressed', () => {
-    render(<HotKeys {...mockHandlers} />);
-    fireEvent.keyDown(document, { key: 'n', ctrlKey: true });
-    expect(mockHandlers.onAddSlide).toHaveBeenCalledTimes(1);
-  });
-
   it('calls onDeleteSlide when Ctrl+D is pressed', () => {
     render(<HotKeys {...mockHandlers} />);
     fireEvent.keyDown(document, { key: 'd', ctrlKey: true });
@@ -77,16 +63,12 @@ describe('HotKeys', () => {
     fireEvent.keyDown(document, { key: 'ArrowDown' });
     fireEvent.keyDown(document, { key: 'ArrowUp' });
     fireEvent.keyDown(document, { key: 'Escape' });
-    fireEvent.keyDown(document, { key: 's', ctrlKey: true });
-    fireEvent.keyDown(document, { key: 'n', ctrlKey: true });
     fireEvent.keyDown(document, { key: 'd', ctrlKey: true });
     fireEvent.keyDown(document, { key: 'f', ctrlKey: true });
     expect(mockHandlers.onNextSlide).not.toHaveBeenCalled();
     expect(mockHandlers.onPrevSlide).not.toHaveBeenCalled();
-    expect(mockHandlers.onAddSlide).not.toHaveBeenCalled();
     expect(mockHandlers.onDeleteSlide).not.toHaveBeenCalled();
     expect(mockHandlers.onToggleFullscreen).not.toHaveBeenCalled();
-    expect(mockHandlers.onSave).not.toHaveBeenCalled();
   });
 
   it.skip('does not trigger handlers when in editable element', () => {
@@ -103,23 +85,11 @@ describe('HotKeys', () => {
     fireEvent.keyDown(input, { key: 'ArrowDown' });
     fireEvent.keyDown(input, { key: 'ArrowUp' });
     fireEvent.keyDown(input, { key: 'Escape' });
-    fireEvent.keyDown(input, { key: 's', ctrlKey: true });
-    fireEvent.keyDown(input, { key: 'n', ctrlKey: true });
     fireEvent.keyDown(input, { key: 'd', ctrlKey: true });
     fireEvent.keyDown(input, { key: 'f', ctrlKey: true });
     expect(mockHandlers.onNextSlide).not.toHaveBeenCalled();
     expect(mockHandlers.onPrevSlide).not.toHaveBeenCalled();
-    expect(mockHandlers.onAddSlide).not.toHaveBeenCalled();
     expect(mockHandlers.onDeleteSlide).not.toHaveBeenCalled();
     expect(mockHandlers.onToggleFullscreen).not.toHaveBeenCalled();
-    expect(mockHandlers.onSave).not.toHaveBeenCalled();
-  });
-
-  it('handles meta key (Command) on Mac', () => {
-    render(<HotKeys {...mockHandlers} />);
-    
-    // Simulate Mac Command key
-    fireEvent.keyDown(document, { key: 's', metaKey: true });
-    expect(mockHandlers.onSave).toHaveBeenCalledTimes(1);
   });
 }); 

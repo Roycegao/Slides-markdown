@@ -4,8 +4,6 @@ import HotKeys from '../components/HotKeys';
 
 describe('HotKeys', () => {
   const handlers = {
-    onSave: vi.fn(),
-    onAddSlide: vi.fn(),
     onDeleteSlide: vi.fn(),
     onToggleFullscreen: vi.fn(),
     onNextSlide: vi.fn(),
@@ -26,18 +24,6 @@ describe('HotKeys', () => {
     render(<HotKeys {...handlers} />);
     fireEvent.keyDown(document, { key: 'ArrowLeft' });
     expect(handlers.onPrevSlide).toHaveBeenCalledTimes(1);
-  });
-
-  it('should call onSave when Ctrl+S is pressed', () => {
-    render(<HotKeys {...handlers} />);
-    fireEvent.keyDown(document, { key: 's', ctrlKey: true });
-    expect(handlers.onSave).toHaveBeenCalledTimes(1);
-  });
-
-  it('should call onAddSlide when Ctrl+N is pressed', () => {
-    render(<HotKeys {...handlers} />);
-    fireEvent.keyDown(document, { key: 'n', ctrlKey: true });
-    expect(handlers.onAddSlide).toHaveBeenCalledTimes(1);
   });
 
   it('should call onDeleteSlide when Delete is pressed', () => {

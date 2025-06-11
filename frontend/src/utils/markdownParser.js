@@ -1,4 +1,5 @@
-import { unified } from 'unified';
+import unifiedDefault, { unified as unifiedNamed } from 'unified';
+const unified = unifiedDefault || unifiedNamed;
 import remarkParse from 'remark-parse';
 import remarkGfm from 'remark-gfm';
 import { visit } from 'unist-util-visit';
@@ -24,22 +25,7 @@ export const NodeTypes = {
   TABLE_CELL: 'tableCell',
 };
 
-// Convert remark AST to custom AST
-function transformToCustomAST(remarkAST) {
-  const customAST = {
-    type: NodeTypes.ROOT,
-    children: [],
-  };
 
-  visit(remarkAST, (node) => {
-    const transformedNode = transformNode(node);
-    if (transformedNode) {
-      customAST.children.push(transformedNode);
-    }
-  });
-
-  return customAST;
-}
 
 // Convert single node
 function transformNode(node) {

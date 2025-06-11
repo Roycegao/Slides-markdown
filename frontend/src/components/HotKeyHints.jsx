@@ -3,8 +3,6 @@ import React from 'react';
 const HOTKEYS = [
   { key: '←', description: 'Previous slide' },
   { key: '→', description: 'Next slide' },
-  { key: '⌘/Ctrl + S', description: 'Save' },
-  { key: '⌘/Ctrl + N', description: 'New slide' },
   { key: 'Delete', description: 'Delete slide' },
   { key: 'Esc', description: 'Exit fullscreen' }
 ];
