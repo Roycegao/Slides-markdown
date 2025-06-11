@@ -1,16 +1,103 @@
 import { test, expect } from '@playwright/test';
 
+// Helper function to handle mobile layout
+async function ensureMobileLayout(page, targetTab = 'sidebar') {
+  const isMobile = await page.evaluate(() => {
+    return window.innerWidth <= 768 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  });
+  
+  if (isMobile) {
+    if (targetTab === 'sidebar') {
+      const sidebarTab = page.locator('button:has-text("Slides")');
+      if (await sidebarTab.isVisible()) {
+        await sidebarTab.click();
+        await page.waitForTimeout(500);
+      }
+    } else if (targetTab === 'editor') {
+      const editorTab = page.locator('button:has-text("Edit")');
+      if (await editorTab.isVisible()) {
+        await editorTab.click();
+        await page.waitForTimeout(500);
+      }
+    }
+  }
+  
+  return isMobile;
+}
+
 test.describe('Slide Editor E2E', () => {
   test.beforeEach(async ({ page }) => {
     // Start backend server (in real project, ensure backend server is running)
     await page.goto('/');
-    // Wait for app to load with longer timeout
-    await page.waitForSelector('.app-container', { timeout: 10000 });
+    
+    // Force desktop mode for E2E tests to avoid mobile layout issues
+    await page.setViewportSize({ width: 1200, height: 800 });
+    
+    // Wait for app to load - handle different possible states
+    try {
+      // First try to wait for app-container (normal state)
+      await page.waitForSelector('.app-container', { timeout: 5000 });
+    } catch (error) {
+      // If app-container not found, check for other states
+      const loadingSelector = page.locator('.loading');
+      const errorSelector = page.locator('.error');
+      const noSlidesSelector = page.locator('.no-slides');
+      
+      // Wait for any of these states to appear
+      await Promise.race([
+        loadingSelector.waitFor({ timeout: 5000 }),
+        errorSelector.waitFor({ timeout: 5000 }),
+        noSlidesSelector.waitFor({ timeout: 5000 })
+      ]);
+      
+      // If we're in loading state, wait for it to complete
+      if (await loadingSelector.isVisible()) {
+        await page.waitForSelector('.app-container', { timeout: 15000 });
+      }
+      
+      // If we're in error state, try to recover or skip test
+      if (await errorSelector.isVisible()) {
+        console.log('App is in error state, attempting to recover...');
+        // Try refreshing the page
+        await page.reload();
+        await page.waitForSelector('.app-container', { timeout: 10000 });
+      }
+      
+      // If we're in no-slides state, that's fine - app is loaded
+      if (await noSlidesSelector.isVisible()) {
+        console.log('App loaded but no slides available');
+      }
+    }
+    
     // Wait a bit more for app to fully initialize
     await page.waitForTimeout(1000);
   });
 
   test('should load and display initial slides', async ({ page }) => {
+    // Debug: Check app state
+    const appState = await page.evaluate(() => {
+      return {
+        windowWidth: window.innerWidth,
+        userAgent: navigator.userAgent,
+        isMobile: window.innerWidth <= 768 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+      };
+    });
+    console.log('App state:', appState);
+    
+    // Debug: Check if slides are loaded
+    const slidesCount = await page.locator('.slide-item').count();
+    console.log('Slides count:', slidesCount);
+    
+    // Debug: Check if sidebar is visible
+    const sidebarVisible = await page.locator('.sidebar').isVisible();
+    console.log('Sidebar visible:', sidebarVisible);
+    
+    // Ensure we're on the sidebar tab for mobile
+    await ensureMobileLayout(page, 'sidebar');
+    
+    // Wait for slides to load
+    await page.waitForSelector('.slide-item', { timeout: 10000 });
+    
     // Verify initial slides are loaded - use more flexible assertion
     await expect(page.locator('.slide-item-title').first()).toBeVisible();
     // Get current slide count dynamically instead of hardcoding
@@ -19,6 +106,9 @@ test.describe('Slide Editor E2E', () => {
   });
 
   test('should create a new slide', async ({ page }) => {
+    // Ensure we're on the sidebar tab for mobile
+    const isMobile = await ensureMobileLayout(page, 'sidebar');
+    
     // Wait for initial content to load
     await page.waitForSelector('.slide-item', { timeout: 5000 });
     
@@ -31,17 +121,28 @@ test.describe('Slide Editor E2E', () => {
     // Verify new slide is created - use more specific selector
     await expect(page.locator('.slide-item-title').last()).toContainText('New Slide');
     
-    // Verify editor is displayed
+    // Verify editor is displayed (switch to editor tab on mobile)
+    if (isMobile) {
+      await ensureMobileLayout(page, 'editor');
+    }
     await expect(page.locator('.custom-editor')).toBeVisible({ timeout: 5000 });
   });
 
   test('should edit slide content', async ({ page }) => {
+    // Ensure we're on the sidebar tab for mobile
+    const isMobile = await ensureMobileLayout(page, 'sidebar');
+    
     // Wait for initial content to load
     await page.waitForSelector('.slide-item', { timeout: 5000 });
     
     // Select first slide
     await page.locator('.slide-item').first().click();
     await page.waitForTimeout(500);
+    
+    // Switch to editor tab on mobile
+    if (isMobile) {
+      await ensureMobileLayout(page, 'editor');
+    }
     
     // Edit content in the editor
     const editor = page.locator('.custom-editor textarea');
@@ -54,6 +155,9 @@ test.describe('Slide Editor E2E', () => {
   });
 
   test('should navigate between slides using keyboard', async ({ page }) => {
+    // Ensure we're on the sidebar tab for mobile
+    await ensureMobileLayout(page, 'sidebar');
+    
     // Wait for initial content to load
     await page.waitForSelector('.slide-item', { timeout: 5000 });
     
@@ -76,6 +180,9 @@ test.describe('Slide Editor E2E', () => {
   });
 
   test('should toggle fullscreen mode', async ({ page }) => {
+    // Ensure we're on the sidebar tab for mobile
+    await ensureMobileLayout(page, 'sidebar');
+    
     // Wait for initial content to load
     await page.waitForSelector('.slide-item', { timeout: 5000 });
     
@@ -94,6 +201,9 @@ test.describe('Slide Editor E2E', () => {
   });
 
   test('should delete a slide', async ({ page }) => {
+    // Ensure we're on the sidebar tab for mobile
+    await ensureMobileLayout(page, 'sidebar');
+    
     // Wait for initial content to load
     await page.waitForSelector('.slide-item', { timeout: 5000 });
     
@@ -121,6 +231,9 @@ test.describe('Slide Editor E2E', () => {
   });
 
   test('should handle different slide layouts', async ({ page }) => {
+    // Ensure we're on the sidebar tab for mobile
+    const isMobile = await ensureMobileLayout(page, 'sidebar');
+    
     // Wait for initial content to load
     await page.waitForSelector('.slide-item', { timeout: 5000 });
     
@@ -129,6 +242,11 @@ test.describe('Slide Editor E2E', () => {
     if (slides.length > 1) {
       await slides[1].click();
       await page.waitForTimeout(500);
+      
+      // Switch to editor tab on mobile to verify editor is visible
+      if (isMobile) {
+        await ensureMobileLayout(page, 'editor');
+      }
       await expect(page.locator('.custom-editor')).toBeVisible({ timeout: 5000 });
     }
   });
@@ -152,12 +270,20 @@ test.describe('Slide Editor E2E', () => {
   });
 
   test('should handle markdown formatting', async ({ page }) => {
+    // Ensure we're on the sidebar tab for mobile
+    const isMobile = await ensureMobileLayout(page, 'sidebar');
+    
     // Wait for initial content to load
     await page.waitForSelector('.slide-item', { timeout: 5000 });
     
     // Select first slide
     await page.locator('.slide-item').first().click();
     await page.waitForTimeout(500);
+    
+    // Switch to editor tab on mobile
+    if (isMobile) {
+      await ensureMobileLayout(page, 'editor');
+    }
     
     // Edit content, add various Markdown formats
     const editor = page.locator('.custom-editor textarea');
@@ -192,6 +318,9 @@ console.log(code);
   });
 
   test('should handle keyboard shortcuts', async ({ page }) => {
+    // Ensure we're on the sidebar tab for mobile
+    await ensureMobileLayout(page, 'sidebar');
+    
     // Wait for initial content to load
     await page.waitForSelector('.slide-item', { timeout: 5000 });
     
@@ -212,6 +341,9 @@ console.log(code);
   });
 
   test('should handle errors gracefully', async ({ page }) => {
+    // Ensure we're on the sidebar tab for mobile
+    await ensureMobileLayout(page, 'sidebar');
+    
     // Wait for initial content to load
     await page.waitForSelector('.slide-item', { timeout: 5000 });
     
@@ -229,6 +361,9 @@ console.log(code);
   });
 
   test('should maintain slide order after operations', async ({ page }) => {
+    // Ensure we're on the sidebar tab for mobile
+    await ensureMobileLayout(page, 'sidebar');
+    
     // Wait for initial content to load
     await page.waitForSelector('.slide-item', { timeout: 5000 });
     

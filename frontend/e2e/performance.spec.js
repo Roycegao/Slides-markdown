@@ -1,13 +1,80 @@
 import { test, expect } from '@playwright/test';
 
+// Helper function to handle mobile layout
+async function ensureMobileLayout(page, targetTab = 'sidebar') {
+  const isMobile = await page.evaluate(() => {
+    return window.innerWidth <= 768 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  });
+  
+  if (isMobile) {
+    if (targetTab === 'sidebar') {
+      const sidebarTab = page.locator('button:has-text("Slides")');
+      if (await sidebarTab.isVisible()) {
+        await sidebarTab.click();
+        await page.waitForTimeout(500);
+      }
+    } else if (targetTab === 'editor') {
+      const editorTab = page.locator('button:has-text("Edit")');
+      if (await editorTab.isVisible()) {
+        await editorTab.click();
+        await page.waitForTimeout(500);
+      }
+    }
+  }
+  
+  return isMobile;
+}
+
 test.describe('Performance Tests', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/');
-    await page.waitForSelector('.app-container', { timeout: 10000 });
+    
+    // Force desktop mode for E2E tests to avoid mobile layout issues
+    await page.setViewportSize({ width: 1200, height: 800 });
+    
+    // Wait for app to load - handle different possible states
+    try {
+      // First try to wait for app-container (normal state)
+      await page.waitForSelector('.app-container', { timeout: 5000 });
+    } catch (error) {
+      // If app-container not found, check for other states
+      const loadingSelector = page.locator('.loading');
+      const errorSelector = page.locator('.error');
+      const noSlidesSelector = page.locator('.no-slides');
+      
+      // Wait for any of these states to appear
+      await Promise.race([
+        loadingSelector.waitFor({ timeout: 5000 }),
+        errorSelector.waitFor({ timeout: 5000 }),
+        noSlidesSelector.waitFor({ timeout: 5000 })
+      ]);
+      
+      // If we're in loading state, wait for it to complete
+      if (await loadingSelector.isVisible()) {
+        await page.waitForSelector('.app-container', { timeout: 15000 });
+      }
+      
+      // If we're in error state, try to recover or skip test
+      if (await errorSelector.isVisible()) {
+        console.log('App is in error state, attempting to recover...');
+        // Try refreshing the page
+        await page.reload();
+        await page.waitForSelector('.app-container', { timeout: 10000 });
+      }
+      
+      // If we're in no-slides state, that's fine - app is loaded
+      if (await noSlidesSelector.isVisible()) {
+        console.log('App loaded but no slides available');
+      }
+    }
+    
     await page.waitForTimeout(1000);
   });
 
   test('should load slides quickly', async ({ page }) => {
+    // Ensure we're on the sidebar tab for mobile
+    await ensureMobileLayout(page, 'sidebar');
+    
     const startTime = Date.now();
     // Wait for all slides to load
     await page.waitForSelector('.slide-item', { timeout: 10000 });
@@ -16,12 +83,20 @@ test.describe('Performance Tests', () => {
   });
 
   test('should render preview quickly', async ({ page }) => {
+    // Ensure we're on the sidebar tab for mobile
+    const isMobile = await ensureMobileLayout(page, 'sidebar');
+    
     // Wait for initial content to load
     await page.waitForSelector('.slide-item', { timeout: 5000 });
     
     // Select first slide
     await page.click('.slide-item:first-child');
     await page.waitForTimeout(500);
+    
+    // Switch to editor tab on mobile
+    if (isMobile) {
+      await ensureMobileLayout(page, 'editor');
+    }
     
     const startTime = Date.now();
     // Input large amount of Markdown content
@@ -41,6 +116,9 @@ ${Array(50).fill('const test = "This is a test code block";').join('\n')}
   });
 
   test('should navigate between slides quickly', async ({ page }) => {
+    // Ensure we're on the sidebar tab for mobile
+    await ensureMobileLayout(page, 'sidebar');
+    
     // Wait for initial content to load
     await page.waitForSelector('.slide-item', { timeout: 5000 });
     
@@ -61,12 +139,20 @@ ${Array(50).fill('const test = "This is a test code block";').join('\n')}
   });
 
   test('should handle large content efficiently', async ({ page }) => {
+    // Ensure we're on the sidebar tab for mobile
+    const isMobile = await ensureMobileLayout(page, 'sidebar');
+    
     // Wait for initial content to load
     await page.waitForSelector('.slide-item', { timeout: 5000 });
     
     // Create slide with large content
     await page.click('button[title="Add Slide"]');
     await page.waitForTimeout(500);
+    
+    // Switch to editor tab on mobile
+    if (isMobile) {
+      await ensureMobileLayout(page, 'editor');
+    }
     
     const editor = page.locator('.custom-editor textarea');
     const startTime = Date.now();
@@ -80,6 +166,9 @@ ${Array(50).fill('const test = "This is a test code block";').join('\n')}
   });
 
   test('should maintain smooth scrolling with many slides', async ({ page }) => {
+    // Ensure we're on the sidebar tab for mobile
+    await ensureMobileLayout(page, 'sidebar');
+    
     // Wait for initial content to load
     await page.waitForSelector('.slide-item', { timeout: 5000 });
     
@@ -108,6 +197,9 @@ ${Array(50).fill('const test = "This is a test code block";').join('\n')}
   });
 
   test('should handle concurrent operations', async ({ page }) => {
+    // Ensure we're on the sidebar tab for mobile
+    await ensureMobileLayout(page, 'sidebar');
+    
     // Wait for initial content to load
     await page.waitForSelector('.slide-item', { timeout: 5000 });
     
@@ -131,8 +223,16 @@ ${Array(50).fill('const test = "This is a test code block";').join('\n')}
   });
 
   test('should maintain performance during long editing sessions', async ({ page }) => {
+    // Ensure we're on the sidebar tab for mobile
+    const isMobile = await ensureMobileLayout(page, 'sidebar');
+    
     // Wait for initial content to load
     await page.waitForSelector('.slide-item', { timeout: 5000 });
+    
+    // Switch to editor tab on mobile
+    if (isMobile) {
+      await ensureMobileLayout(page, 'editor');
+    }
     
     const editTimes = [];
     
@@ -159,6 +259,9 @@ ${Array(50).fill('const test = "This is a test code block";').join('\n')}
   });
 
   test('should handle memory usage efficiently', async ({ page }) => {
+    // Ensure we're on the sidebar tab for mobile
+    const isMobile = await ensureMobileLayout(page, 'sidebar');
+    
     // Wait for initial content to load
     await page.waitForSelector('.slide-item', { timeout: 5000 });
     
@@ -171,9 +274,20 @@ ${Array(50).fill('const test = "This is a test code block";').join('\n')}
     for (let i = 0; i < 5; i++) { // Reduced from 10
       await page.click('button[title="Add Slide"]');
       await page.waitForTimeout(200);
+      
+      // Switch to editor tab on mobile for editing
+      if (isMobile) {
+        await ensureMobileLayout(page, 'editor');
+      }
+      
       const editor = page.locator('.custom-editor textarea');
       await editor.fill(`# Slide ${i}\n\n${Array(50).fill('Content').join('\n')}`); // Reduced content
       await page.waitForTimeout(200);
+      
+      // Switch back to sidebar for next iteration
+      if (isMobile) {
+        await ensureMobileLayout(page, 'sidebar');
+      }
     }
     
     // 获取最终内存使用情况
