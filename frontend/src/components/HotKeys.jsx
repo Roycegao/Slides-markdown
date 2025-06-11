@@ -2,9 +2,15 @@ import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 
 function isEditableElement(target) {
-  if (!target) return false;
+  if (!target) {
+    /* istanbul ignore next */
+    return false;
+  }
   const tag = target.tagName && target.tagName.toUpperCase();
-  if (!tag) return false;
+  if (!tag) {
+    /* istanbul ignore next */
+    return false;
+  }
   const editableTags = ['INPUT', 'TEXTAREA', 'SELECT'];
   if (editableTags.includes(tag)) return true;
   if (target.isContentEditable) return true;

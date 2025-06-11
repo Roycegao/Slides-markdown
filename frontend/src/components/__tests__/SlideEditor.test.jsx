@@ -198,4 +198,49 @@ describe('SlideEditor', () => {
     expect(getByLabelText('Image URL:')).toBeInTheDocument();
     expect(getByLabelText('Caption:')).toBeInTheDocument();
   });
+
+  it('does not render metadata fields for default layout', () => {
+    render(<SlideEditor slide={{ ...mockSlide, layout: 'default' }} onSave={mockOnSave} />);
+    // 不应出现任何metadata相关label
+    expect(screen.queryByLabelText('Code Language:')).toBeNull();
+    expect(screen.queryByLabelText('Left Title:')).toBeNull();
+    expect(screen.queryByLabelText('Image URL:')).toBeNull();
+  });
+
+  it('does not render metadata fields for title layout', () => {
+    render(<SlideEditor slide={{ ...mockSlide, layout: 'title' }} onSave={mockOnSave} />);
+    expect(screen.queryByLabelText('Code Language:')).toBeNull();
+    expect(screen.queryByLabelText('Left Title:')).toBeNull();
+    expect(screen.queryByLabelText('Image URL:')).toBeNull();
+  });
+
+  it('handles metadata as undefined', () => {
+    render(<SlideEditor slide={{ ...mockSlide, metadata: undefined }} onSave={mockOnSave} />);
+    const saveButton = screen.getByText('Save Changes');
+    fireEvent.click(saveButton);
+    expect(mockOnSave).toHaveBeenCalledWith({
+      content: mockSlide.content,
+      layout: 'default',
+      metadata: {}
+    });
+  });
+
+  it('switches layout and updates metadata fields accordingly', () => {
+    render(<SlideEditor slide={mockSlide} onSave={mockOnSave} />);
+    const layoutSelect = screen.getByLabelText('Layout:');
+    // 切换到 code
+    fireEvent.change(layoutSelect, { target: { value: 'code' } });
+    expect(screen.getByLabelText('Code Language:')).toBeInTheDocument();
+    // 切换到 split
+    fireEvent.change(layoutSelect, { target: { value: 'split' } });
+    expect(screen.getByLabelText('Left Title:')).toBeInTheDocument();
+    // 切换到 image
+    fireEvent.change(layoutSelect, { target: { value: 'image' } });
+    expect(screen.getByLabelText('Image URL:')).toBeInTheDocument();
+    // 切回 default
+    fireEvent.change(layoutSelect, { target: { value: 'default' } });
+    expect(screen.queryByLabelText('Code Language:')).toBeNull();
+    expect(screen.queryByLabelText('Left Title:')).toBeNull();
+    expect(screen.queryByLabelText('Image URL:')).toBeNull();
+  });
 }); 

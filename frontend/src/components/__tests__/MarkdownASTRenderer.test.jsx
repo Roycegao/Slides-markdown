@@ -40,4 +40,45 @@ describe('MarkdownASTRenderer', () => {
     const { container } = render(<MarkdownASTRenderer ast={ast} />);
     expect(container).toBeTruthy();
   });
+  it('handles codeBlock with unsupported lang', () => {
+    const ast = { type: 'codeBlock', value: 'abc', lang: 'notalanguage' };
+    const { getByText } = render(<MarkdownASTRenderer ast={ast} />);
+    expect(getByText('abc')).toBeInTheDocument();
+  });
+  it('handles codeBlock with no lang', () => {
+    const ast = { type: 'codeBlock', value: 'no lang' };
+    const { getByText } = render(<MarkdownASTRenderer ast={ast} />);
+    expect(getByText('no lang')).toBeInTheDocument();
+  });
+  it('handles codeBlock highlight error', () => {
+    // mock hljs.highlight 抛异常
+    const ast = { type: 'codeBlock', value: 'err', lang: 'javascript' };
+    const oldHighlight = require('highlight.js/lib/core').highlight;
+    require('highlight.js/lib/core').highlight = () => { throw new Error('fail'); };
+    const { getByText } = render(<MarkdownASTRenderer ast={ast} />);
+    expect(getByText('err')).toBeInTheDocument();
+    require('highlight.js/lib/core').highlight = oldHighlight;
+  });
+  it('handles null/undefined/empty children in table/tableRow/tableCell', () => {
+    const ast = {
+      type: 'table',
+      children: [
+        { type: 'tableRow', children: [
+          { type: 'tableCell', children: null },
+          { type: 'tableCell', children: undefined },
+          { type: 'tableCell', children: [] },
+        ] },
+        { type: 'tableRow', children: null },
+        { type: 'tableRow', children: undefined },
+        { type: 'tableRow', children: [] },
+      ]
+    };
+    const { container } = render(<MarkdownASTRenderer ast={ast} />);
+    expect(container.querySelectorAll('td').length).toBe(3);
+    expect(container.querySelectorAll('tr').length).toBe(4);
+  });
+  it('handles null node', () => {
+    const { container } = render(<MarkdownASTRenderer ast={null} />);
+    expect(container).toBeTruthy();
+  });
 }); 

@@ -164,4 +164,101 @@ describe('SlidePreview', () => {
     const { getByText } = render(<SlidePreview content={'meta'} layout="default" metadata={null} />);
     expect(getByText('meta')).toBeInTheDocument();
   });
+
+  it('renders code layout without explanation when explanation is falsy', () => {
+    const { getByText } = render(<SlidePreview content={'code'} layout="code" metadata={{ explanation: '' }} />);
+    expect(getByText('code')).toBeInTheDocument();
+    // 不应该显示解释部分
+    expect(() => screen.getByText('Code Explanation')).toThrow();
+  });
+
+  it('renders code layout without explanation when explanation is null', () => {
+    const { getByText } = render(<SlidePreview content={'code'} layout="code" metadata={{ explanation: null }} />);
+    expect(getByText('code')).toBeInTheDocument();
+    // 不应该显示解释部分
+    expect(() => screen.getByText('Code Explanation')).toThrow();
+  });
+
+  it('renders code layout with explanation but no language', () => {
+    const { getByText } = render(<SlidePreview content={'code'} layout="code" metadata={{ explanation: 'explain', language: '' }} />);
+    expect(getByText('explain')).toBeInTheDocument();
+    expect(getByText('Code Explanation')).toBeInTheDocument();
+  });
+
+  it('renders code layout with explanation but language is null', () => {
+    const { getByText } = render(<SlidePreview content={'code'} layout="code" metadata={{ explanation: 'explain', language: null }} />);
+    expect(getByText('explain')).toBeInTheDocument();
+    expect(getByText('Code Explanation')).toBeInTheDocument();
+  });
+
+  it('renders split layout without leftTitle', () => {
+    const { getByText } = render(<SlidePreview content={'left---right'} layout="split" metadata={{ rightTitle: 'R' }} />);
+    expect(getByText('R')).toBeInTheDocument();
+    expect(getByText('left')).toBeInTheDocument();
+    expect(getByText('right')).toBeInTheDocument();
+    // 不应该显示左标题
+    expect(() => screen.getByText('L')).toThrow();
+  });
+
+  it('renders split layout without rightTitle', () => {
+    const { getByText } = render(<SlidePreview content={'left---right'} layout="split" metadata={{ leftTitle: 'L' }} />);
+    expect(getByText('L')).toBeInTheDocument();
+    expect(getByText('left')).toBeInTheDocument();
+    expect(getByText('right')).toBeInTheDocument();
+    // 不应该显示右标题
+    expect(() => screen.getByText('R')).toThrow();
+  });
+
+  it('renders split layout without both titles', () => {
+    const { getByText } = render(<SlidePreview content={'left---right'} layout="split" metadata={{}} />);
+    expect(getByText('left')).toBeInTheDocument();
+    expect(getByText('right')).toBeInTheDocument();
+    // 不应该显示任何标题
+    expect(() => screen.getByText('L')).toThrow();
+    expect(() => screen.getByText('R')).toThrow();
+  });
+
+  it('renders image layout without imageUrl', () => {
+    const { getByText } = render(<SlidePreview content={'img content'} layout="image" metadata={{ caption: 'caption' }} />);
+    expect(getByText('caption')).toBeInTheDocument();
+    expect(getByText('img content')).toBeInTheDocument();
+    // 不应该显示图片
+    expect(() => screen.getByRole('img')).toThrow();
+  });
+
+  it('renders image layout with empty imageUrl', () => {
+    const { getByText } = render(<SlidePreview content={'img content'} layout="image" metadata={{ imageUrl: '', caption: 'caption' }} />);
+    expect(getByText('caption')).toBeInTheDocument();
+    expect(getByText('img content')).toBeInTheDocument();
+    // 不应该显示图片
+    expect(() => screen.getByRole('img')).toThrow();
+  });
+
+  it('renders image layout with null imageUrl', () => {
+    const { getByText } = render(<SlidePreview content={'img content'} layout="image" metadata={{ imageUrl: null, caption: 'caption' }} />);
+    expect(getByText('caption')).toBeInTheDocument();
+    expect(getByText('img content')).toBeInTheDocument();
+    // 不应该显示图片
+    expect(() => screen.getByRole('img')).toThrow();
+  });
+
+  it('renders fullscreen without mobile', () => {
+    const { container } = render(<SlidePreview content={'full'} isFullscreen={true} isMobile={false} currentIndex={2} totalSlides={5} />);
+    expect(container.textContent).toContain('full');
+    expect(container.textContent).toContain('3/5');
+  });
+
+  it('renders fullscreen with mobile', () => {
+    const { container } = render(<SlidePreview content={'full'} isFullscreen={true} isMobile={true} currentIndex={2} totalSlides={5} />);
+    expect(container.textContent).toContain('full');
+    // 移动端不应该显示页码
+    expect(container.textContent).not.toContain('3/5');
+  });
+
+  it('renders non-fullscreen', () => {
+    const { container } = render(<SlidePreview content={'normal'} isFullscreen={false} currentIndex={2} totalSlides={5} />);
+    expect(container.textContent).toContain('normal');
+    // 非全屏不应该显示页码
+    expect(container.textContent).not.toContain('3/5');
+  });
 }); 
