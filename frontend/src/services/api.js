@@ -64,4 +64,4 @@ export async function deleteSlide(id) {
   } catch {
     return { success: true };
   }
-}
+} 
