@@ -25,6 +25,24 @@ async function ensureMobileLayout(page, targetTab = 'sidebar') {
   return isMobile;
 }
 
+// Helper to clear all slides (only for delete test)
+async function clearAllSlides() {
+  const slides = await fetch('https://slides-markdown-server.vercel.app/slides').then(r => r.json());
+  for (const slide of slides) {
+    await fetch(`https://slides-markdown-server.vercel.app/slides/${slide.id}`, { method: 'DELETE' });
+  }
+}
+
+// Helper to check if API is available
+async function isApiAvailable() {
+  try {
+    const res = await fetch('https://slides-markdown-server.vercel.app/slides');
+    return res.ok;
+  } catch {
+    return false;
+  }
+}
+
 test.describe('Slide Editor E2E', () => {
   test.beforeEach(async ({ page }) => {
     // Start backend server (in real project, ensure backend server is running)
@@ -244,6 +262,11 @@ test.describe('Slide Editor E2E', () => {
   });
 
   test('should delete a slide', async ({ page }) => {
+    if (!(await isApiAvailable())) {
+      test.skip('API not available, skipping test');
+    }
+    // 清空所有 slides，保证测试隔离
+    await clearAllSlides();
     // Ensure we're on the sidebar tab for mobile
     await ensureMobileLayout(page, 'sidebar');
     
@@ -271,6 +294,8 @@ test.describe('Slide Editor E2E', () => {
       // Skip test if there's only one slide
       test.skip();
     }
+    // 测试结束后再次清空，避免影响后续测试
+    await clearAllSlides();
   });
 
   test('should handle different slide layouts', async ({ page }) => {
