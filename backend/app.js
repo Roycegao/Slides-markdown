@@ -131,27 +131,17 @@ const defaultSlides = [
   },
   {
     order: 7,
-    content: "## 🚧 Challenges & Solutions\n\n**Challenge 1: Mobile Responsiveness**\n- **Problem**: Complex layout on small screens\n- **Solution**: Tab-based navigation for mobile, landscape mode optimization\n- **Result**: Seamless experience across all devices\n- **Takeaway**: Mobile-first design is crucial for modern applications\n\n**Challenge 2: Real-time Auto-save Performance**\n- **Problem**: Frequent API calls causing performance issues\n- **Solution**: Implemented debounced save with 500ms delay\n- **Result**: Smooth editing without lag\n- **Takeaway**: Debounced operations prevent performance bottlenecks\n\n**Challenge 3: Touch Gesture Navigation**\n- **Problem**: Swipe gestures conflicting with scrollable content\n- **Solution**: Smart gesture detection excluding code blocks and tables\n- **Result**: Intuitive mobile navigation\n- **Takeaway**: Touch interactions need careful consideration of content types\n\n**Challenge 4: Code Block Styling Consistency**\n- **Problem**: Inconsistent appearance across screen orientations\n- **Solution**: Unified CSS with responsive breakpoints\n- **Result**: Consistent code display everywhere\n- **Takeaway**: Consistent styling requires systematic approach",
-    metadata: {}
-  },
-  {
-    order: 8,
     content: "## 🎓 Key Takeaways\n\n**Component Design**\n- Clean component architecture with proper separation of concerns\n- Reusable components improve maintainability\n- Storybook facilitates component development and testing\n\n**State Management**\n- Local state sufficient for current feature set\n- Optimistic updates create responsive feel\n- Proper error handling improves user trust\n\n**Development Workflow**\n- Test-first approach with Vitest & Playwright\n- Documentation importance for maintainability\n- Code quality with ESLint & proper linting\n\n**User Experience**\n- Smooth animations significantly improve perceived performance\n- Mobile responsiveness is crucial for modern apps\n- Keyboard shortcuts and touch gestures enhance efficiency\n- Consistent design across all screen sizes matters\n\n**Technical Excellence**\n- Debounced operations prevent performance issues\n- Proper error handling improves user trust\n- Optimistic updates create responsive feel\n- Accessibility considerations are essential",
     metadata: {}
   },
   {
-    order: 9,
-    content: `## 🎯 Personal Background & Learning Journey\n\n**Technical Background**\n\n- **Primary Stack**: Java (Spring) & Python for backend development\n\n- **Experience**: 9 years as a full-stack developer, with a strong backend focus\n\n- **Challenge**: Coming from a backend-heavy background,\nI had limited experience with modern React, which made this project an exciting opportunity to grow\n\n**Why This Project?**\n\n- **Goal**: Step outside my comfort zone and prove my ability to quickly adapt\n\n- **Time Constraint**: Very limited time for a full-featured frontend project\n\n- **Approach**: Focused on best practices and a production-ready architecture using modern tools\n\n**What I Learned**\n\n- **Testing**: Understood the critical value of integration (Playwright) and unit testing (Vitest)\n\n- **Component Design**: Saw how Storybook helps build and isolate UI components efficiently\n\n- **Modern Tooling**: Appreciated Vite’s superior speed over traditional build systems\n\n- **Responsive Design**: Learned how mobile-first design improves usability across devices\n\n**Transferable Skills**\n\n- **Architecture Thinking**: Applied backend principles to organize frontend structure\n\n- **Performance Mindset**: Used database tuning experience to improve UI responsiveness\n\n- **API Integration**: Designed a RESTful backend that cleanly supports frontend needs\n\n- **DevOps Practices**: Set up CI/CD workflows and deployed with Vercel\n\n**Growth Mindset**\n\n- **Adaptability**: Learned an unfamiliar stack under pressure\n\n- **Problem Solving**: Tackled frontend issues with a systematic, backend-rooted mindset\n\n- **Quality Focus**: Maintained high standards despite the short timeline\n\n- **Curiosity-Driven**: Enjoyed discovering tools and techniques that were new to me\n\n`,
-    metadata: {}
-  },
-  {
-    order: 10,
+    order: 8,
     content: "## 🔮 Future Considerations\n\nThe architecture accommodates several future enhancements:\n\n**Real-time Collaboration**\n- WebSocket integration for live editing\n- User presence indicators & live cursors\n\n**Export & Sharing**\n- PDF/PPT export functionality\n\n**AI-Powered Features**\n- AI-driven content suggestions\n- Voice-to-text input\n- Automated slide generation\n- Smart content optimization\n\n**Scalability**\n- Migration to PostgreSQL for larger datasets\n- Load balancing\n- Caching strategies",
     metadata: {}
   },
   {
-    order: 11,
-    content: "## 👨‍💻 Author\n\n- Name: **Royce**\n- Age: 34\n- Experience: 9 years full-stack development\n- Stack: Java (Spring), Python, React, MySQL, Node.js, LLM, RAG\n- Email: **roycegao513@gmail.com**\n\n🧠 Thank you for reading! \n\n ![image](https://pbs.twimg.com/profile_images/1723248873806942208/EalEraX0_400x400.jpg)",
+    order: 9,
+    content: "## 👨‍💻 Author\n\n- Name: **Royce**\n- Experience: 9 years full-stack development\n- Stack: Java (Spring), Python, React, MySQL, Node.js, LLM, RAG\n- Email: **roycegao513@gmail.com**\n\n🧠 Thank you for reading! \n\n ![image](https://pbs.twimg.com/profile_images/1723248873806942208/EalEraX0_400x400.jpg)",
     metadata: {}
   }
 ];
